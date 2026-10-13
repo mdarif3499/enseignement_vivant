@@ -16,5 +16,19 @@ class AppRoutes {
   static const imagesScreen = '/imagesScreen';
   static const imageDetailScreen = '/imageDetailScreen';
   static const verseOfDayScreen = '/verseOfDayScreen';
+  static const audioScreen = '/audioScreen';
+  static const audioDetailScreen = '/audioDetailScreen';
+  static const downloadsScreen = '/downloadsScreen';
+  static const languageScreen = '/languageScreen';
+  static const settingsScreen = '/settingsScreen';
+  static const notificationSettingScreen = '/notificationSettingScreen';
+  static const changePasswordScreen = '/changePasswordScreen';
+  static const termsScreen = '/termsScreen';
+  static const privacyPolicyScreen = '/privacyPolicyScreen';
+  static const helpSupportScreen = '/helpSupportScreen';
+  static const aboutUsScreen = '/aboutUsScreen';
+  static const deleteAccountScreen = '/deleteAccountScreen';
+  static const editProfileScreen = '/editProfileScreen';
+  static const notificationsScreen = '/notificationsScreen';
   static const mainScreen = '/mainScreen';
 }

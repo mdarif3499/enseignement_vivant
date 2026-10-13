@@ -2,6 +2,7 @@ class ImageString {
   static const String logoImg = 'assets/images/app_image.png';
   static const String splashImg = 'assets/images/app_image.png';
   static const String profileImg = 'assets/images/profileImg.png';
+  static const String homeCardImg = 'assets/images/home_card_image.jpg';
 
   static const String tempBackground = 'assets/temp/background.jpg';
   static const String tempBackground2 = 'assets/temp/background_2.png';

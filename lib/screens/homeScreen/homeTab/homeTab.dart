@@ -113,7 +113,7 @@ class _HomeTabState extends State<HomeTab> {
                 /// Notification Bell Button
                 GestureDetector(
                   onTap: () {
-                    // Handle notifications
+                    Get.toNamed(AppRoutes.notificationsScreen);
                   },
                   child: Container(
                     width: 40.w,
@@ -151,14 +151,9 @@ class _HomeTabState extends State<HomeTab> {
               height: 180.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.r),
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF0F3035),
-                    Color(0xFF134E4A),
-                    Color(0xFF0F2027),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                image: const DecorationImage(
+                  image: AssetImage(ImageString.homeCardImg),
+                  fit: BoxFit.fill,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -240,7 +235,7 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
 
-            Gap(height: 20.h),
+            Gap(height: 40.h),
 
             /// Grid Categories (3 columns x 2 rows)
             GridView.count(
@@ -261,7 +256,7 @@ class _HomeTabState extends State<HomeTab> {
                   iconPath: ConstIcons.audioIcon,
                   title: ConstString.audio.tr,
                   iconBgColor: const Color(0xFFFFF9E7),
-                  onTap: () => Get.toNamed(AppRoutes.teachingsScreen),
+                  onTap: () => Get.toNamed(AppRoutes.audioScreen),
                 ),
                 CategoryCard(
                   iconPath: ConstIcons.encouragementIcon,

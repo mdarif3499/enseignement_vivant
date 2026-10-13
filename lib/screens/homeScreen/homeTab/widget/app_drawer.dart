@@ -44,18 +44,18 @@ class CustomDrawer extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE6F6F4),
+                  color: ConstColor.primaryTeal,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 22.r,
-                      backgroundColor: ConstColor.primaryTeal,
+                      backgroundColor: Colors.white24,
                       child: CircleAvatar(
                         radius: 20.r,
-                        backgroundImage: const AssetImage(ImageString.profileImg),
-                        child: Icon(Icons.person, color: Colors.white, size: 24.sp),
+                        backgroundColor: const Color(0xFFE0F2F1),
+                        child: Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 24.sp),
                       ),
                     ),
                     SizedBox(width: 12.w),
@@ -68,7 +68,7 @@ class CustomDrawer extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF222222),
+                              color: Colors.white,
                               fontFamily: 'SFPro',
                             ),
                           ),
@@ -79,7 +79,7 @@ class CustomDrawer extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: const Color(0xFF7A7A7A),
+                              color: Colors.white70,
                               fontFamily: 'SFPro',
                             ),
                           ),
@@ -88,7 +88,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: ConstColor.primaryTeal,
+                      color: Colors.white,
                       size: 22.sp,
                     ),
                   ],
@@ -97,48 +97,61 @@ class CustomDrawer extends StatelessWidget {
 
               Gap(height: 20.h),
 
-              /// Drawer Items using PNG Icons
+              /// Drawer Items
               _drawerItem(
                 iconPath: ConstIcons.downloadIcon,
                 title: ConstString.downloads.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.downloadsScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.languageIcon,
                 title: ConstString.language.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.languageScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.settingsIcon,
                 title: ConstString.settings.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.settingsScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.termsIcon,
                 title: ConstString.termsAndConditions.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.termsScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.privacyIcon,
                 title: ConstString.privacyPolicy.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.privacyPolicyScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.helpSupportIcon,
                 title: ConstString.helpAndSupport.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.helpSupportScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.deleteIcon,
                 title: ConstString.accountDelete.tr,
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(AppRoutes.deleteAccountScreen);
+                },
               ),
               _drawerItem(
                 iconPath: ConstIcons.logoutIcon,
                 title: ConstString.logout.tr,
                 isLogout: true,
                 onTap: () {
-                  Get.back();
                   Get.offAllNamed(AppRoutes.signInScreen);
                 },
               ),
@@ -161,11 +174,8 @@ class CustomDrawer extends StatelessWidget {
               Row(
                 children: [
                   _socialIcon(ConstIcons.facebookIcon),
-
                   _socialIcon(ConstIcons.instagramIcon),
-
                   _socialIcon(ConstIcons.youtubeIcon),
-
                   _socialIcon(ConstIcons.tiktokIcon),
                 ],
               ),
@@ -241,7 +251,7 @@ class CustomDrawer extends StatelessWidget {
     return Container(
       width: 34.w,
       height: 34.h,
-
+      margin: EdgeInsets.only(right: 8.w),
       child: Center(
         child: Image.asset(
           iconPath,

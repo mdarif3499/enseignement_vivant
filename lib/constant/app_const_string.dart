@@ -71,13 +71,47 @@ class ConstString {
   static const String morningMercy = 'morningMercy';
   static const String theLordIsNear = 'theLordIsNear';
 
+  static const String favoritesTitle = 'favoritesTitle';
+  static const String favoritesSubtitle = 'favoritesSubtitle';
+
+  static const String audioTitle = 'audioTitle';
+  static const String relatedPrayers = 'relatedPrayers';
+
   static const String downloads = 'downloads';
   static const String language = 'language';
+  static const String french = 'french';
+  static const String english = 'english';
+  static const String saveChanges = 'saveChanges';
+
   static const String settings = 'settings';
+  static const String changePassword = 'changePassword';
+  static const String notification = 'notification';
+  static const String notificationSetting = 'notificationSetting';
+  static const String generalNotification = 'generalNotification';
+  static const String sound = 'sound';
+  static const String currentPassword = 'currentPassword';
+
   static const String termsAndConditions = 'termsAndConditions';
   static const String privacyPolicy = 'privacyPolicy';
   static const String helpAndSupport = 'helpAndSupport';
+  static const String helpSubtitle = 'helpSubtitle';
+  static const String issueTitle = 'issueTitle';
+  static const String description = 'description';
+  static const String writeHere = 'writeHere';
+  static const String submit = 'submit';
+  static const String aboutUs = 'aboutUs';
+
   static const String accountDelete = 'accountDelete';
+  static const String deleteAccountDesc1 = 'deleteAccountDesc1';
+  static const String deleteAccountDesc2 = 'deleteAccountDesc2';
+  static const String enterVerificationCode = 'enterVerificationCode';
+
+  static const String accountInformation = 'accountInformation';
+  static const String country = 'country';
+  static const String phone = 'phone';
+  static const String editProfile = 'editProfile';
+  static const String changeProfilePicture = 'changeProfilePicture';
+
   static const String logout = 'logout';
   static const String followUs = 'followUs';
 
@@ -88,4 +122,13 @@ class ConstString {
   static const String noInternetConnection = 'noInternetConnection';
   static const String pleaseCheckInternet = 'pleaseCheckInternet';
   static const String tryAgain = 'tryAgain';
+
+  static const String notifications = 'notifications';
+  static const String bookingConfirmation = 'bookingConfirmation';
+  static const String bookingConfirmedDesc = 'bookingConfirmedDesc';
+  static const String paymentSuccessful = 'paymentSuccessful';
+  static const String paymentDoneDesc = 'paymentDoneDesc';
+  static const String enjoy30Off = 'enjoy30Off';
+  static const String enjoy30OffDesc = 'enjoy30OffDesc';
+  static const String santaMariaMessage = 'santaMariaMessage';
 }

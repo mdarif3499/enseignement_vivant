@@ -5,6 +5,8 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/constant/app_assert_icons.dart';
 import 'package:enseignement_vivant/screens/homeScreen/homeTab/homeTab.dart';
+import 'package:enseignement_vivant/screens/homeScreen/favoritesTab/favorites_tab.dart';
+import 'package:enseignement_vivant/screens/homeScreen/profileTab/profile_tab.dart';
 import 'package:enseignement_vivant/screens/homeScreen/homeTab/widget/app_drawer.dart';
 import 'controller/mainController.dart';
 
@@ -22,8 +24,8 @@ class MainScreen extends StatelessWidget {
         index: controller.currentIndex.value,
         children: const [
           HomeTab(),
-          Center(child: Text('Favorite Page', style: TextStyle(color: ConstColor.black))),
-          Center(child: Text('Profile Page', style: TextStyle(color: ConstColor.black))),
+          FavoritesTab(),
+          ProfileTab(),
         ],
       ),
       bottomNavigationBar: _buildBottomNavBar(controller),

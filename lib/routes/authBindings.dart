@@ -10,6 +10,18 @@ import 'package:enseignement_vivant/screens/homeScreen/encouragementsScreen/cont
 import 'package:enseignement_vivant/screens/homeScreen/teachingsScreen/controller/teachings_controller.dart';
 import 'package:enseignement_vivant/screens/homeScreen/imagesScreen/controller/images_controller.dart';
 import 'package:enseignement_vivant/screens/homeScreen/verseOfDayScreen/controller/verse_of_day_controller.dart';
+import 'package:enseignement_vivant/screens/homeScreen/favoritesTab/controller/favorites_controller.dart';
+import 'package:enseignement_vivant/screens/homeScreen/audioScreen/controller/audio_screen_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/downloadsScreen/controller/downloads_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/languageScreen/controller/language_screen_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/settingsScreen/controller/settings_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/settingsScreen/controller/notification_setting_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/settingsScreen/controller/change_password_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/helpSupportScreen/controller/help_support_controller.dart';
+import 'package:enseignement_vivant/screens/drawerScreens/deleteAccountScreen/controller/delete_account_controller.dart';
+import 'package:enseignement_vivant/screens/homeScreen/profileTab/controller/profile_controller.dart';
+import 'package:enseignement_vivant/screens/homeScreen/profileTab/controller/edit_profile_controller.dart';
+import 'package:enseignement_vivant/screens/homeScreen/notificationScreen/controller/notifications_controller.dart';
 import 'package:enseignement_vivant/screens/homeScreen/mainScreen/controller/mainController.dart';
 
 class AuthBindings extends Bindings {
@@ -26,6 +38,18 @@ class AuthBindings extends Bindings {
     Get.lazyPut(() => TeachingsController());
     Get.lazyPut(() => ImagesController());
     Get.lazyPut(() => VerseOfDayController());
+    Get.lazyPut(() => FavoritesController());
+    Get.lazyPut(() => AudioScreenController());
+    Get.lazyPut(() => DownloadsController());
+    Get.lazyPut(() => LanguageScreenController());
+    Get.lazyPut(() => SettingsController());
+    Get.lazyPut(() => NotificationSettingController());
+    Get.lazyPut(() => ChangePasswordController());
+    Get.lazyPut(() => HelpSupportController());
+    Get.lazyPut(() => DeleteAccountController());
+    Get.lazyPut(() => ProfileController());
+    Get.lazyPut(() => EditProfileController());
+    Get.lazyPut(() => NotificationsController());
     Get.lazyPut(() => MainController());
   }
 }
