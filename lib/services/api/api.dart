@@ -52,7 +52,7 @@ class AppApi {
             }
 
             String token = storageServices.getToken();
-            if (token.isNotEmpty) {
+            if (token.isNotEmpty && !options.headers.containsKey("Authorization")) {
               options.headers["Authorization"] = "Bearer $token";
             }
 
@@ -69,8 +69,17 @@ class AppApi {
 
           try {
             if (error.response?.statusCode == 401) {
-              storageServices.storageClear();
-              Get.offAllNamed(AppRoutes.signInScreen);
+              final requestPath = error.requestOptions.path;
+              final isAuthEndpoint = requestPath.contains('/auth/reset-password') ||
+                  requestPath.contains('/auth/verify') ||
+                  requestPath.contains('/auth/login') ||
+                  requestPath.contains('/auth/forget-password') ||
+                  requestPath.contains('/user');
+
+              if (!isAuthEndpoint) {
+                storageServices.storageClear();
+                Get.offAllNamed(AppRoutes.signInScreen);
+              }
               return handler.next(error);
             }
           } catch (e) {

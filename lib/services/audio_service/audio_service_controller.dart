@@ -1,5 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/utils/app_log.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
+import 'package:enseignement_vivant/widgers/custom_snack_bar/app_snack_bar.dart';
 
 class AudioServiceController extends GetxController {
   final AudioPlayer audioPlayer = AudioPlayer();
@@ -12,6 +16,21 @@ class AudioServiceController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    AudioPlayer.global.setAudioContext(AudioContext(
+      android: const AudioContextAndroid(
+        stayAwake: true,
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.gain,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: const {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
 
     audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying.value = state == PlayerState.playing;
@@ -27,14 +46,48 @@ class AudioServiceController extends GetxController {
   }
 
   Future<void> playAudio({required String url, required String id}) async {
-    if (currentPlayingId.value == id && isPlaying.value) {
-      await audioPlayer.pause();
-    } else if (currentPlayingId.value == id && !isPlaying.value) {
-      await audioPlayer.resume();
-    } else {
-      currentPlayingId.value = id;
-      await audioPlayer.stop();
-      await audioPlayer.play(UrlSource(url));
+    String formattedUrl = url.trim();
+    if (formattedUrl.isNotEmpty && !formattedUrl.startsWith('http')) {
+      if (formattedUrl.startsWith('/files/')) {
+        formattedUrl = "${AppApiEndPoint.instance.domain}$formattedUrl";
+      } else if (formattedUrl.startsWith('/')) {
+        formattedUrl = "${AppApiEndPoint.instance.imageBaseUrl}$formattedUrl";
+      } else {
+        formattedUrl = "${AppApiEndPoint.instance.imageBaseUrl}/$formattedUrl";
+      }
+    }
+
+    try {
+      if (currentPlayingId.value == id && isPlaying.value) {
+        await audioPlayer.pause();
+      } else if (currentPlayingId.value == id && !isPlaying.value) {
+        await audioPlayer.resume();
+      } else {
+        currentPlayingId.value = id;
+        await audioPlayer.stop();
+        if (formattedUrl.isNotEmpty) {
+          appLog("Playing Audio URL: $formattedUrl");
+          String? mimeType;
+          if (formattedUrl.endsWith('.mp3')) {
+            mimeType = 'audio/mpeg';
+          } else if (formattedUrl.endsWith('.wav')) {
+            mimeType = 'audio/wav';
+          } else if (formattedUrl.endsWith('.m4a') || formattedUrl.endsWith('.aac')) {
+            mimeType = 'audio/mp4';
+          } else if (formattedUrl.endsWith('.ogg')) {
+            mimeType = 'audio/ogg';
+          }
+
+          await audioPlayer.play(
+            UrlSource(formattedUrl, mimeType: mimeType),
+          );
+        } else {
+          AppSnackBar.instance.error("Audio URL not available");
+        }
+      }
+    } catch (e) {
+      errorLog('Audio Player Play Error', e);
+      AppSnackBar.instance.error("Unable to play audio");
     }
   }
 

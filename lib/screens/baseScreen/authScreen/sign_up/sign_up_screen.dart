@@ -15,7 +15,7 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignUpController());
+    final controller = Get.find<SignUpController>();
 
     return Scaffold(
       backgroundColor: ConstColor.primaryBackground,
@@ -180,7 +180,9 @@ class SignUpScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     isLoading: controller.isLoading.value,
-                    onTap: controller.isLoading.value ? null : controller.onCreateAccount,
+                    onTap: controller.isLoading.value
+                        ? null
+                        : controller.onCreateAccount,
                   ),
                 ),
 
@@ -192,7 +194,7 @@ class SignUpScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "${ConstString.dontHaveAccount.tr} ",
+                        "${ConstString.alreadyHaveAccount.tr} ",
                         style: TextStyle(
                           color: const Color(0xFF7A7A7A),
                           fontSize: 13.sp,

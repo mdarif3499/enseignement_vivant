@@ -1,115 +1,117 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:enseignement_vivant/constant/app_assert_image.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import '../model/audio_item_model.dart';
 
 class AudioScreenController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final RxBool isSearching = false.obs;
+  final RxBool isLoading = false.obs;
 
   final RxString selectedCategory = ConstString.all.obs;
 
   final RxList<AudioItemModel> allAudioList = <AudioItemModel>[].obs;
   final RxList<AudioItemModel> filteredAudioList = <AudioItemModel>[].obs;
 
-  final List<String> categories = [
+  final RxList<String> categories = <String>[
     ConstString.all,
     ConstString.prayer,
     ConstString.audio,
     ConstString.encouragement,
-  ];
-
-  static const String demoAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+  ].obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadAudioItems();
+    fetchAudioList();
   }
 
-  void loadAudioItems() {
-    final list = [
-      AudioItemModel(
-        id: '1',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '2',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem1,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '3',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.encouragement,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem2,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '4',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem3,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '5',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem4,
-        audioUrl: demoAudioUrl,
-      ),
-    ];
+  Future<void> fetchAudioList() async {
+    isLoading.value = true;
+    try {
+      final queryParams = <String, dynamic>{
+        "status": "published",
+      };
 
-    allAudioList.assignAll(list);
-    _applyFilter();
+      if (selectedCategory.value != ConstString.all &&
+          selectedCategory.value.trim().isNotEmpty) {
+        queryParams["category"] = selectedCategory.value.trim();
+      }
+
+      final response = await ApiServices.instance.getServices(
+        AppApiEndPoint.instance.audio,
+        queryParameters: queryParams,
+      );
+
+      if (isClosed) return;
+
+      if (response != null && response['data'] != null && response['data'] is List) {
+        final List listData = response['data'];
+        final audios = listData
+            .map((item) => AudioItemModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        allAudioList.assignAll(audios);
+
+        // Dynamically collect unique categories from items
+        final catSet = <String>{ConstString.all, "Worship", "Prayer", "Encouragement"};
+        for (var item in audios) {
+          if (item.categoryTag.isNotEmpty) {
+            catSet.add(item.categoryTag);
+          }
+        }
+        categories.assignAll(catSet.toList());
+
+        _applySearchFilter();
+      } else {
+        allAudioList.clear();
+        filteredAudioList.clear();
+      }
+    } catch (e) {
+      if (isClosed) return;
+      errorLog('Fetch Audio List Error', e);
+      allAudioList.clear();
+      filteredAudioList.clear();
+    } finally {
+      if (!isClosed) isLoading.value = false;
+    }
   }
 
   void filterByCategory(String cat) {
+    if (selectedCategory.value == cat) return;
     selectedCategory.value = cat;
-    _applyFilter();
+    fetchAudioList();
   }
 
   void filterBySearch(String query) {
-    _applyFilter();
+    _applySearchFilter();
   }
 
-  void _applyFilter() {
+  void _applySearchFilter() {
     final query = searchController.text.trim().toLowerCase();
-    final cat = selectedCategory.value;
 
-    filteredAudioList.assignAll(
-      allAudioList.where((item) {
-        final matchesCat = cat == ConstString.all || item.categoryTag == cat;
-        final matchesSearch = query.isEmpty ||
-            item.title.toLowerCase().contains(query) ||
-            item.subtitle.toLowerCase().contains(query);
-        return matchesCat && matchesSearch;
-      }).toList(),
-    );
+    if (query.isEmpty) {
+      filteredAudioList.assignAll(allAudioList);
+    } else {
+      filteredAudioList.assignAll(
+        allAudioList.where((item) {
+          return item.title.toLowerCase().contains(query) ||
+              item.subtitle.toLowerCase().contains(query) ||
+              item.categoryTag.toLowerCase().contains(query) ||
+              item.contentText.toLowerCase().contains(query);
+        }).toList(),
+      );
+    }
   }
 
   void toggleSearch() {
     isSearching.value = !isSearching.value;
     if (!isSearching.value) {
       searchController.clear();
-      _applyFilter();
+      _applySearchFilter();
     }
   }
 

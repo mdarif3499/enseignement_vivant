@@ -34,10 +34,28 @@ class ImageGridCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               /// Background Image
-              Image.asset(
-                item.imagePath,
-                fit: BoxFit.cover,
-              ),
+              item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                  ? Image.network(
+                      item.imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFF1E1B3A),
+                        child: Icon(Icons.image_outlined, color: Colors.white54, size: 36.sp),
+                      ),
+                    )
+                  : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                      ? Image.asset(
+                          item.imagePath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: const Color(0xFF1E1B3A),
+                            child: Icon(Icons.image_outlined, color: Colors.white54, size: 36.sp),
+                          ),
+                        )
+                      : Container(
+                          color: const Color(0xFF1E1B3A),
+                          child: Icon(Icons.image_outlined, color: Colors.white54, size: 36.sp),
+                        )),
 
               /// Dark Gradient Overlay
               Container(

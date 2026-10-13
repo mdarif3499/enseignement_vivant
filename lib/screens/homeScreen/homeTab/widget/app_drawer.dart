@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/constant/app_assert_image.dart';
 import 'package:enseignement_vivant/constant/app_assert_icons.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
+import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -64,7 +65,9 @@ class CustomDrawer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Sara",
+                            StorageServices.instance.getUserName().isNotEmpty
+                                ? StorageServices.instance.getUserName()
+                                : "User",
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
@@ -74,7 +77,9 @@ class CustomDrawer extends StatelessWidget {
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            "sarahashem@gmail.com",
+                            StorageServices.instance.getUserEmail().isNotEmpty
+                                ? StorageServices.instance.getUserEmail()
+                                : "",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -151,7 +156,8 @@ class CustomDrawer extends StatelessWidget {
                 iconPath: ConstIcons.logoutIcon,
                 title: ConstString.logout.tr,
                 isLogout: true,
-                onTap: () {
+                onTap: () async {
+                  await StorageServices.instance.storageClear();
                   Get.offAllNamed(AppRoutes.signInScreen);
                 },
               ),

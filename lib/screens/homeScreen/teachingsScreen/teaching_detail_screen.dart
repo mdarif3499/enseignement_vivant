@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/audio_service/audio_service_controller.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'model/teaching_model.dart';
 
@@ -16,20 +19,73 @@ class TeachingDetailScreen extends StatefulWidget {
 class _TeachingDetailScreenState extends State<TeachingDetailScreen> {
   late TeachingModel item;
   bool isFavorite = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    item = Get.arguments is TeachingModel
-        ? Get.arguments as TeachingModel
-        : TeachingModel(
-            id: '1',
-            title: "Morning Prayer",
-            durationText: "15:45",
-            subtitle: "Place today in God's hands and rest in His faithfulness.",
-            imagePath: "assets/temp/item.jpg",
-            audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-          );
+    final args = Get.arguments;
+    if (args is TeachingModel) {
+      item = args;
+      if (item.id.isNotEmpty) {
+        fetchSingleTeachingDetails(item.id);
+      }
+    } else if (args is String && args.isNotEmpty) {
+      item = TeachingModel(
+        id: args,
+        title: "Loading...",
+        durationText: "0:00",
+        subtitle: "",
+        imagePath: "",
+        audioUrl: "",
+        contentText: "",
+      );
+      fetchSingleTeachingDetails(args);
+    } else if (args is Map && args['_id'] != null) {
+      item = TeachingModel.fromJson(args as Map<String, dynamic>);
+      if (item.id.isNotEmpty) {
+        fetchSingleTeachingDetails(item.id);
+      }
+    } else {
+      item = TeachingModel(
+        id: '1',
+        title: "Morning Prayer",
+        durationText: "15:45",
+        subtitle: "Place today in God's hands and rest in His faithfulness.",
+        imagePath: "",
+        audioUrl: "",
+        contentText: "",
+      );
+    }
+  }
+
+  Future<void> fetchSingleTeachingDetails(String id) async {
+    if (id.isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiServices.instance.getServices(
+        "${AppApiEndPoint.instance.teaching}/$id",
+      );
+
+      if (mounted && response != null && response['data'] != null && response['data'] is Map<String, dynamic>) {
+        final freshItem = TeachingModel.fromJson(response['data'] as Map<String, dynamic>);
+        setState(() {
+          item = freshItem;
+        });
+      }
+    } catch (e) {
+      errorLog("Fetch Single Teaching Details Error", e);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -48,10 +104,43 @@ class _TeachingDetailScreenState extends State<TeachingDetailScreen> {
               fit: StackFit.expand,
               children: [
                 /// Background Image
-                Image.asset(
-                  item.imagePath,
-                  fit: BoxFit.cover,
-                ),
+                item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty
+                        ? Image.asset(
+                            item.imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                          )),
 
                 /// Gradient Overlay
                 Container(

@@ -5,6 +5,7 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
+  final String? initialValue;
   final String? labelText;
   final String? hintText;
   final Color? textColor;
@@ -53,6 +54,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     this.controller,
+    this.initialValue,
     this.labelText,
     this.hintText,
     this.textColor = const Color(0xFF222222),
@@ -110,6 +112,7 @@ class CustomTextField extends StatelessWidget {
       width: width,
       child: TextFormField(
         controller: controller,
+        initialValue: initialValue,
         obscureText: obscureText,
         readOnly: readOnly,
         enabled: enabled,
@@ -134,18 +137,18 @@ class CustomTextField extends StatelessWidget {
               if (value == null || value.trim().isEmpty) {
                 return "This field is required";
               }
-              if (isPassWord && value.length < 6) {
-                return "Must be at least 6 characters.";
-              }
               if (isEmail) {
-                if (isValidEmail(value)) return null;
+                if (isValidEmail(value.trim())) return null;
                 return "Please provide a valid email address";
               }
               if (isPassWord && isPassWordSecondValidation) {
                 final originalPass = isPassWordSecondValidationController?.text;
                 if (originalPass != null && value != originalPass) {
-                  return "Both passwords must match";
+                  return "Passwords do not match";
                 }
+              }
+              if (isPassWord && value.length < 6) {
+                return "Password must be at least 6 characters";
               }
               return null;
             },

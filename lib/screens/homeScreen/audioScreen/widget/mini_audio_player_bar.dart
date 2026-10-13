@@ -53,12 +53,38 @@ class MiniAudioPlayerBar extends StatelessWidget {
               /// Thumbnail
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.r),
-                child: Image.asset(
-                  item.imagePath,
-                  width: 48.w,
-                  height: 48.h,
-                  fit: BoxFit.cover,
-                ),
+                child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        width: 48.w,
+                        height: 48.h,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 48.w,
+                          height: 48.h,
+                          color: const Color(0xFF0F6E65),
+                          child: Icon(Icons.music_note_rounded, color: Colors.white, size: 24.sp),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                        ? Image.asset(
+                            item.imagePath,
+                            width: 48.w,
+                            height: 48.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: 48.w,
+                              height: 48.h,
+                              color: const Color(0xFF0F6E65),
+                              child: Icon(Icons.music_note_rounded, color: Colors.white, size: 24.sp),
+                            ),
+                          )
+                        : Container(
+                            width: 48.w,
+                            height: 48.h,
+                            color: const Color(0xFF0F6E65),
+                            child: Icon(Icons.music_note_rounded, color: Colors.white, size: 24.sp),
+                          )),
               ),
 
               SizedBox(width: 12.w),
@@ -82,9 +108,9 @@ class MiniAudioPlayerBar extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
 
-                    /// Subtitle Bibel • 15:45
+                    /// Subtitle Category & Duration
                     Text(
-                      "Bibel • ${item.durationText}",
+                      "${item.categoryTag.isNotEmpty ? item.categoryTag : 'Audio'}${audioService.duration.value.inSeconds > 0 ? ' • ${audioService.formatDuration(audioService.duration.value)}' : (item.durationText.isNotEmpty ? ' • ${item.durationText}' : '')}",
                       style: TextStyle(
                         fontSize: 10.sp,
                         color: Colors.white70,

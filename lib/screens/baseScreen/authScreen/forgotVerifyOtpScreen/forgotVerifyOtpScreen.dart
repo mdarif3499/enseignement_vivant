@@ -14,7 +14,7 @@ class ForgotVerifyOtpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ForgotVerifyOtpController());
+    final controller = Get.find<ForgotVerifyOtpController>();
 
     final defaultPinTheme = PinTheme(
       width: 46.w,
@@ -125,6 +125,10 @@ class ForgotVerifyOtpScreen extends StatelessWidget {
                     color: ConstColor.primaryTeal,
                   ),
                   keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    controller.isOtpComplete.value = value.trim().length ==
+                        ForgotVerifyOtpController.otpLength;
+                  },
                   onCompleted: (_) => controller.otpFocusNode.unfocus(),
                 ),
               ),
@@ -178,18 +182,24 @@ class ForgotVerifyOtpScreen extends StatelessWidget {
 
               /// Verify Button
               Obx(
-                () => CustomButton(
-                  text: ConstString.verify.tr,
-                  height: 50.h,
-                  borderRadius: 28,
-                  backgroundColor: ConstColor.primaryTeal,
-                  gradientColors: null,
-                  textColor: Colors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  isLoading: controller.isLoading.value,
-                  onTap: controller.isLoading.value ? null : controller.onVerifyCode,
-                ),
+                () {
+                  final canClick = controller.isOtpComplete.value &&
+                      !controller.isLoading.value;
+                  return CustomButton(
+                    text: ConstString.verify.tr,
+                    height: 50.h,
+                    borderRadius: 28,
+                    backgroundColor: canClick
+                        ? ConstColor.primaryTeal
+                        : const Color(0xFFC4C4C4),
+                    gradientColors: null,
+                    textColor: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    isLoading: controller.isLoading.value,
+                    onTap: canClick ? controller.onVerifyCode : null,
+                  );
+                },
               ),
 
               Gap(height: 20.h),

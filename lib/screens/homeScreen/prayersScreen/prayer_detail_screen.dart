@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'model/prayer_category_model.dart';
 
@@ -15,17 +18,66 @@ class PrayerDetailScreen extends StatefulWidget {
 class _PrayerDetailScreenState extends State<PrayerDetailScreen> {
   late PrayerCategoryModel item;
   bool isFavorite = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    item = Get.arguments is PrayerCategoryModel
-        ? Get.arguments as PrayerCategoryModel
-        : PrayerCategoryModel(
-            title: "Morning Prayer",
-            subtitle: "Place today in God's hands and rest in His faithfulness.",
-            imagePath: "assets/temp/item.jpg",
-          );
+    final args = Get.arguments;
+    if (args is PrayerCategoryModel) {
+      item = args;
+      if (item.id.isNotEmpty) {
+        fetchSinglePrayerDetails(item.id);
+      }
+    } else if (args is String && args.isNotEmpty) {
+      item = PrayerCategoryModel(
+        id: args,
+        title: "Loading...",
+        subtitle: "",
+        coverImage: "",
+      );
+      fetchSinglePrayerDetails(args);
+    } else if (args is Map && args['_id'] != null) {
+      item = PrayerCategoryModel.fromJson(args as Map<String, dynamic>);
+      if (item.id.isNotEmpty) {
+        fetchSinglePrayerDetails(item.id);
+      }
+    } else {
+      item = PrayerCategoryModel(
+        title: "Morning Prayer",
+        subtitle: "Place today in God's hands and rest in His faithfulness.",
+        coverImage: "",
+      );
+    }
+  }
+
+  Future<void> fetchSinglePrayerDetails(String prayerId) async {
+    if (prayerId.isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiServices.instance.getServices(
+        "${AppApiEndPoint.instance.prayer}/$prayerId",
+      );
+
+      if (mounted && response != null && response['data'] != null && response['data'] is Map<String, dynamic>) {
+        final freshItem = PrayerCategoryModel.fromJson(response['data'] as Map<String, dynamic>);
+        setState(() {
+          item = freshItem;
+        });
+      }
+    } catch (e) {
+      errorLog("Fetch Single Prayer Details Error", e);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -42,10 +94,43 @@ class _PrayerDetailScreenState extends State<PrayerDetailScreen> {
               fit: StackFit.expand,
               children: [
                 /// Background Image
-                Image.asset(
-                  item.imagePath,
-                  fit: BoxFit.cover,
-                ),
+                item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty
+                        ? Image.asset(
+                            item.imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                          )),
 
                 /// Gradient Overlay
                 Container(

@@ -1,4 +1,7 @@
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+
 class EncouragementModel {
+  final String id;
   final String title;
   final String subtitle;
   final String imagePath;
@@ -6,16 +9,38 @@ class EncouragementModel {
   final String contentText;
 
   EncouragementModel({
-    required this.title,
-    required this.subtitle,
-    required this.imagePath,
-    this.categoryTag = 'ENCOURAGEMENTS',
-    this.contentText = '''Heavenly Father, I come to You with open hands and a grateful heart. Today I surrender my plans, my worries, and my fears into Your care.
-
-Lead me in Your wisdom. Quiet the noise within me, and let Your peace be the first thing I hear. Help me to trust that You are good, that You are near, and that You are working in every detail of my life.
-
-Shape my words, guide my steps, and fill my heart with Your love so that I may be a light to others.
-
-In Jesus' name, Amen.''',
+    this.id = '',
+    this.title = '',
+    this.subtitle = '',
+    this.imagePath = '',
+    this.categoryTag = 'ENCOURAGEMENT',
+    this.contentText = '',
   });
+
+  factory EncouragementModel.fromJson(Map<String, dynamic> json) {
+    String photo = json['photo']?.toString() ?? json['coverImage']?.toString() ?? json['image']?.toString() ?? '';
+    if (photo.isNotEmpty) {
+      if (photo.startsWith('http://') || photo.startsWith('https://')) {
+        // already full URL
+      } else if (photo.startsWith('/files/')) {
+        photo = "${AppApiEndPoint.instance.domain}$photo";
+      } else if (photo.startsWith('/')) {
+        photo = "${AppApiEndPoint.instance.imageBaseUrl}$photo";
+      } else {
+        photo = "${AppApiEndPoint.instance.imageBaseUrl}/$photo";
+      }
+    }
+
+    final msg = json['message']?.toString() ?? '';
+    final authorText = json['author']?.toString() ?? '';
+
+    return EncouragementModel(
+      id: json['_id']?.toString() ?? '',
+      title: authorText.isNotEmpty ? authorText : 'Word of Encouragement',
+      subtitle: authorText.isNotEmpty ? authorText : 'Encouragement',
+      imagePath: photo,
+      categoryTag: 'ENCOURAGEMENT',
+      contentText: msg,
+    );
+  }
 }

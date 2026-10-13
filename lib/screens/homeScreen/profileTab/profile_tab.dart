@@ -60,7 +60,8 @@ class ProfileTab extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 24.r,
                         backgroundColor: const Color(0xFFE0F2F1),
-                        child: Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                        child: Icon(Icons.person_rounded,
+                            color: ConstColor.primaryTeal, size: 28.sp),
                       ),
                     ),
                     SizedBox(width: 14.w),
@@ -145,7 +146,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.name.value),
+                      key: ValueKey(controller.name.value),
+                      initialValue: controller.name.value,
                       readOnly: true,
                     ),
                   ],
@@ -170,7 +172,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.email.value),
+                      key: ValueKey(controller.email.value),
+                      initialValue: controller.email.value,
                       readOnly: true,
                     ),
                   ],
@@ -195,7 +198,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.country.value),
+                      key: ValueKey(controller.country.value),
+                      initialValue: controller.country.value,
                       readOnly: true,
                       suffixIcon: Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -225,7 +229,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.phone.value),
+                      key: ValueKey(controller.phone.value),
+                      initialValue: controller.phone.value,
                       readOnly: true,
                     ),
                   ],

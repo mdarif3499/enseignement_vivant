@@ -1,21 +1,69 @@
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+
 class PrayerCategoryModel {
+  final String id;
   final String title;
   final String subtitle;
-  final String imagePath;
+  final String coverImage;
   final String categoryTag;
   final String prayerText;
+  final String audioUrl;
+  final String duration;
+  final String status;
+
+  String get imagePath => coverImage;
 
   PrayerCategoryModel({
+    this.id = '',
     required this.title,
     required this.subtitle,
-    required this.imagePath,
+    required this.coverImage,
     this.categoryTag = 'PRAYER',
-    this.prayerText = '''Heavenly Father, I come to You with open hands and a grateful heart. Today I surrender my plans, my worries, and my fears into Your care.
-
-Lead me in Your wisdom. Quiet the noise within me, and let Your peace be the first thing I hear. Help me to trust that You are good, that You are near, and that You are working in every detail of my life.
-
-Shape my words, guide my steps, and fill my heart with Your love so that I may be a light to others.
-
-In Jesus' name, Amen.''',
+    this.prayerText = '',
+    this.audioUrl = '',
+    this.duration = '',
+    this.status = '',
   });
+
+  factory PrayerCategoryModel.fromJson(Map<String, dynamic> json) {
+    String image = json['coverImage']?.toString() ?? json['image']?.toString() ?? '';
+    if (image.isNotEmpty) {
+      if (image.startsWith('http://') || image.startsWith('https://')) {
+        // already full URL
+      } else if (image.startsWith('/files/')) {
+        image = "${AppApiEndPoint.instance.domain}$image";
+      } else if (image.startsWith('/')) {
+        image = "${AppApiEndPoint.instance.imageBaseUrl}$image";
+      } else {
+        image = "${AppApiEndPoint.instance.imageBaseUrl}/$image";
+      }
+    }
+
+    String audio = json['audio']?.toString() ?? '';
+    if (audio.isNotEmpty) {
+      if (audio.startsWith('http://') || audio.startsWith('https://')) {
+        // already full URL
+      } else if (audio.startsWith('/files/')) {
+        audio = "${AppApiEndPoint.instance.domain}$audio";
+      } else if (audio.startsWith('/')) {
+        audio = "${AppApiEndPoint.instance.imageBaseUrl}$audio";
+      } else {
+        audio = "${AppApiEndPoint.instance.imageBaseUrl}/$audio";
+      }
+    }
+
+    final rawPrayer = json['prayer']?.toString() ?? '';
+
+    return PrayerCategoryModel(
+      id: json['_id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      subtitle: json['description']?.toString() ?? json['subtitle']?.toString() ?? '',
+      coverImage: image,
+      categoryTag: 'PRAYER',
+      prayerText: rawPrayer,
+      audioUrl: audio,
+      duration: json['duration']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+    );
+  }
 }

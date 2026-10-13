@@ -38,12 +38,38 @@ class PrayerCategoryItem extends StatelessWidget {
               /// Item Image Thumbnail
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(
-                  item.imagePath,
-                  width: 60.w,
-                  height: 60.h,
-                  fit: BoxFit.cover,
-                ),
+                child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        width: 60.w,
+                        height: 60.h,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 60.w,
+                          height: 60.h,
+                          color: const Color(0xFFE0F2F1),
+                          child: Icon(Icons.auto_stories_rounded, color: const Color(0xFF00897B), size: 28.sp),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty
+                        ? Image.asset(
+                            item.imagePath,
+                            width: 60.w,
+                            height: 60.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: 60.w,
+                              height: 60.h,
+                              color: const Color(0xFFE0F2F1),
+                              child: Icon(Icons.auto_stories_rounded, color: const Color(0xFF00897B), size: 28.sp),
+                            ),
+                          )
+                        : Container(
+                            width: 60.w,
+                            height: 60.h,
+                            color: const Color(0xFFE0F2F1),
+                            child: Icon(Icons.auto_stories_rounded, color: const Color(0xFF00897B), size: 28.sp),
+                          )),
               ),
 
               SizedBox(width: 14.w),

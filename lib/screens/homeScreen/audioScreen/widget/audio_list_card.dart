@@ -51,12 +51,38 @@ class AudioListCard extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12.r),
-                      child: Image.asset(
-                        item.imagePath,
-                        width: 65.w,
-                        height: 65.h,
-                        fit: BoxFit.cover,
-                      ),
+                      child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                          ? Image.network(
+                              item.imagePath,
+                              width: 65.w,
+                              height: 65.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                width: 65.w,
+                                height: 65.h,
+                                color: const Color(0xFFE0F2F1),
+                                child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                              ),
+                            )
+                          : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                              ? Image.asset(
+                                  item.imagePath,
+                                  width: 65.w,
+                                  height: 65.h,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    width: 65.w,
+                                    height: 65.h,
+                                    color: const Color(0xFFE0F2F1),
+                                    child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                                  ),
+                                )
+                              : Container(
+                                  width: 65.w,
+                                  height: 65.h,
+                                  color: const Color(0xFFE0F2F1),
+                                  child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                                )),
                     ),
                     if (isCurrentPlaying)
                       Container(
@@ -95,35 +121,49 @@ class AudioListCard extends StatelessWidget {
                       ),
                       SizedBox(height: 3.h),
 
-                      /// Subtitle Row (Bibel • 15:45)
+                      /// Subtitle Row (Category • Dynamic Duration)
                       Row(
                         children: [
                           Text(
-                            "Bibel",
+                            item.categoryTag.isNotEmpty ? item.categoryTag : "Audio",
                             style: TextStyle(
                               fontSize: 11.sp,
                               color: const Color(0xFF7A7A7A),
                               fontFamily: 'SFPro',
                             ),
                           ),
-                          SizedBox(width: 4.w),
-                          Container(
-                            width: 3.w,
-                            height: 3.h,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF8E8E93),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            item.durationText,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: const Color(0xFF7A7A7A),
-                              fontFamily: 'SFPro',
-                            ),
-                          ),
+                          Builder(builder: (context) {
+                            final isCurrent = audioService.currentPlayingId.value == item.id;
+                            final displayDuration = (isCurrent && audioService.duration.value.inSeconds > 0)
+                                ? audioService.formatDuration(audioService.duration.value)
+                                : item.durationText;
+
+                            if (displayDuration.isEmpty) return const SizedBox.shrink();
+
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(width: 4.w),
+                                Container(
+                                  width: 3.w,
+                                  height: 3.h,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF8E8E93),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  displayDuration,
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: const Color(0xFF7A7A7A),
+                                    fontFamily: 'SFPro',
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
                         ],
                       ),
 
