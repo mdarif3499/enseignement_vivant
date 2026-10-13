@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         translations: AppTranslations(),
         locale: savedLocale,
-        fallbackLocale: LocalizationService.french,
+        fallbackLocale: LocalizationService.english,
         initialRoute: AppRoutes.splashScreen,
         getPages: appRouteFile,
         defaultTransition: Transition.fadeIn,

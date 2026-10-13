@@ -13,8 +13,8 @@ class LocalizationService {
   /// Reads initial saved locale from SharedPreferences at main()
   static Future<Locale> getSavedLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedCode = prefs.getString(_keyLanguage) ?? 'fr';
-    return savedCode == 'en' ? english : french;
+    final savedCode = prefs.getString(_keyLanguage) ?? 'en';
+    return savedCode == 'fr' ? french : english;
   }
 
   /// Change language permanently using LanguageController / SharedPreferences
@@ -31,7 +31,7 @@ class LocalizationService {
     if (Get.isRegistered<LanguageController>()) {
       return Get.find<LanguageController>().selectedLanguage.value;
     }
-    return 'fr';
+    return 'en';
   }
 
   static bool isFrench() => currentLanguageCode() == 'fr';

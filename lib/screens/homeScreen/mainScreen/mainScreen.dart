@@ -18,24 +18,29 @@ class MainScreen extends StatelessWidget {
     final controller = Get.put(MainController());
 
     return Obx(() => Scaffold(
-      backgroundColor: ConstColor.primaryBackground,
-      drawer: const CustomDrawer(),
-      body: IndexedStack(
-        index: controller.currentIndex.value,
-        children: const [
-          HomeTab(),
-          FavoritesTab(),
-          ProfileTab(),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomNavBar(controller),
-    ));
+          backgroundColor: ConstColor.primaryBackground,
+          drawer: const CustomDrawer(),
+          body: IndexedStack(
+            index: controller.currentIndex.value,
+            children: const [
+              HomeTab(),
+              FavoritesTab(),
+              ProfileTab(),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 8.h),
+              child: _buildBottomNavBar(controller),
+            ),
+          ),
+        ));
   }
 
   Widget _buildBottomNavBar(MainController controller) {
     return Container(
-      margin: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h),
-      height: 64.h,
+      height: 68.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(35.r),
@@ -107,6 +112,7 @@ class MainScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+
               /// Nav Icon
               Image.asset(
                 isActive ? activeIconPath : inactiveIconPath,
@@ -115,6 +121,7 @@ class MainScreen extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
               SizedBox(height: 3.h),
+
               /// Nav Label
               Text(
                 label,
@@ -122,7 +129,9 @@ class MainScreen extends StatelessWidget {
                   fontSize: 11.sp,
                   fontFamily: 'SFPro',
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                  color: isActive ? ConstColor.primaryTeal : const Color(0xFF8E8E93),
+                  color: isActive
+                      ? ConstColor.primaryTeal
+                      : const Color(0xFF8E8E93),
                 ),
               ),
               SizedBox(height: 8.h),
