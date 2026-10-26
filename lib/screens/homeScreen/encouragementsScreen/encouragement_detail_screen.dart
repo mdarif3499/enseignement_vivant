@@ -96,7 +96,6 @@ class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                /// Background Image
                 item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
                     ? Image.network(
                         item.imagePath,
