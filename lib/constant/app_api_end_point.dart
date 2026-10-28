@@ -19,7 +19,7 @@ class AppApiEndPoint {
   String authResetPassword = "/auth/reset-password";
   String changePassword = "/auth/change-password";
   String updateProfile = "/user/profile";
-  String deleteAccount = "/user/delete";
+  String deleteAccount = "/user/account-delete";
   String prayer = "/prayer";
   String audio = "/audio";
   String teaching = "/teaching";

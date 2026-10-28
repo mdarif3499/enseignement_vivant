@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/audio_service/audio_service_controller.dart';
+import 'package:enseignement_vivant/services/download/download_service.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/audio_screen_controller.dart';
@@ -107,6 +108,46 @@ class _AudioDetailScreenState extends State<AudioDetailScreen> {
           icon: const Icon(Icons.chevron_left_rounded, color: ConstColor.titleColor, size: 30),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          Obx(() {
+            final downloadService = DownloadService.instance;
+            final isDownloaded = downloadService.isDownloaded(item.id);
+            final isDownloading = downloadService.isDownloading(item.id);
+
+            return IconButton(
+              icon: isDownloading
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: ConstColor.primaryTeal,
+                        value: downloadService.downloadProgress[item.id],
+                      ),
+                    )
+                  : Icon(
+                      isDownloaded ? Icons.download_done_rounded : Icons.file_download_outlined,
+                      color: isDownloaded ? ConstColor.primaryTeal : ConstColor.titleColor,
+                      size: 26.sp,
+                    ),
+              onPressed: () {
+                if (!isDownloaded && !isDownloading) {
+                  downloadService.startDownload(
+                    id: item.id,
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    categoryTag: item.categoryTag.isNotEmpty ? item.categoryTag : 'Audio',
+                    imagePath: item.imagePath,
+                    downloadUrl: item.audioUrl,
+                    durationText: item.durationText,
+                    mediaType: 'AUDIO',
+                  );
+                }
+              },
+            );
+          }),
+          SizedBox(width: 8.w),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

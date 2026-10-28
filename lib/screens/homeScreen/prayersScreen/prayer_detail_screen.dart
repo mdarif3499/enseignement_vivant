@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/services/download/download_service.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'model/prayer_category_model.dart';
@@ -175,28 +176,83 @@ class _PrayerDetailScreenState extends State<PrayerDetailScreen> {
                           ),
                         ),
 
-                        /// Favorite Button
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isFavorite = !isFavorite;
-                            });
-                          },
-                          child: Container(
-                            width: 38.w,
-                            height: 38.h,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withAlpha(40),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                color: isFavorite ? Colors.redAccent : Colors.white,
-                                size: 20.sp,
+                        Row(
+                          children: [
+                            /// Download Button
+                            Obx(() {
+                              final downloadService = DownloadService.instance;
+                              final isDownloaded = downloadService.isDownloaded(item.id);
+                              final isDownloading = downloadService.isDownloading(item.id);
+
+                              return GestureDetector(
+                                onTap: () {
+                                  if (!isDownloaded && !isDownloading) {
+                                    downloadService.startDownload(
+                                      id: item.id,
+                                      title: item.title,
+                                      subtitle: item.subtitle,
+                                      categoryTag: item.categoryTag,
+                                      imagePath: item.coverImage,
+                                      downloadUrl: item.audioUrl.isNotEmpty ? item.audioUrl : item.coverImage,
+                                      durationText: item.duration,
+                                      mediaType: item.audioUrl.isNotEmpty ? 'AUDIO' : 'IMAGE',
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  width: 38.w,
+                                  height: 38.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withAlpha(40),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: isDownloading
+                                        ? SizedBox(
+                                            width: 18.w,
+                                            height: 18.h,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                              value: downloadService.downloadProgress[item.id],
+                                            ),
+                                          )
+                                        : Icon(
+                                            isDownloaded ? Icons.download_done_rounded : Icons.file_download_outlined,
+                                            color: isDownloaded ? ConstColor.primaryTeal : Colors.white,
+                                            size: 20.sp,
+                                          ),
+                                  ),
+                                ),
+                              );
+                            }),
+
+                            SizedBox(width: 10.w),
+
+                            /// Favorite Button
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isFavorite = !isFavorite;
+                                });
+                              },
+                              child: Container(
+                                width: 38.w,
+                                height: 38.h,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha(40),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                    color: isFavorite ? Colors.redAccent : Colors.white,
+                                    size: 20.sp,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),

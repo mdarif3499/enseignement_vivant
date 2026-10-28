@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
@@ -47,7 +48,9 @@ class AudioServiceController extends GetxController {
 
   Future<void> playAudio({required String url, required String id}) async {
     String formattedUrl = url.trim();
-    if (formattedUrl.isNotEmpty && !formattedUrl.startsWith('http')) {
+    final bool isLocalFile = File(formattedUrl).existsSync();
+
+    if (!isLocalFile && formattedUrl.isNotEmpty && !formattedUrl.startsWith('http')) {
       if (formattedUrl.startsWith('/files/')) {
         formattedUrl = "${AppApiEndPoint.instance.domain}$formattedUrl";
       } else if (formattedUrl.startsWith('/')) {
@@ -66,21 +69,26 @@ class AudioServiceController extends GetxController {
         currentPlayingId.value = id;
         await audioPlayer.stop();
         if (formattedUrl.isNotEmpty) {
-          appLog("Playing Audio URL: $formattedUrl");
-          String? mimeType;
-          if (formattedUrl.endsWith('.mp3')) {
-            mimeType = 'audio/mpeg';
-          } else if (formattedUrl.endsWith('.wav')) {
-            mimeType = 'audio/wav';
-          } else if (formattedUrl.endsWith('.m4a') || formattedUrl.endsWith('.aac')) {
-            mimeType = 'audio/mp4';
-          } else if (formattedUrl.endsWith('.ogg')) {
-            mimeType = 'audio/ogg';
-          }
+          appLog("Playing Audio URL: $formattedUrl (isLocal: $isLocalFile)");
 
-          await audioPlayer.play(
-            UrlSource(formattedUrl, mimeType: mimeType),
-          );
+          if (isLocalFile) {
+            await audioPlayer.play(DeviceFileSource(formattedUrl));
+          } else {
+            String? mimeType;
+            if (formattedUrl.endsWith('.mp3')) {
+              mimeType = 'audio/mpeg';
+            } else if (formattedUrl.endsWith('.wav')) {
+              mimeType = 'audio/wav';
+            } else if (formattedUrl.endsWith('.m4a') || formattedUrl.endsWith('.aac')) {
+              mimeType = 'audio/mp4';
+            } else if (formattedUrl.endsWith('.ogg')) {
+              mimeType = 'audio/ogg';
+            }
+
+            await audioPlayer.play(
+              UrlSource(formattedUrl, mimeType: mimeType),
+            );
+          }
         } else {
           AppSnackBar.instance.error("Audio URL not available");
         }
