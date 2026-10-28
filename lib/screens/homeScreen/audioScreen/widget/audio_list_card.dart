@@ -8,11 +8,13 @@ import '../model/audio_item_model.dart';
 class AudioListCard extends StatelessWidget {
   final AudioItemModel item;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const AudioListCard({
     super.key,
     required this.item,
     this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -30,7 +32,12 @@ class AudioListCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            padding: EdgeInsets.only(
+              left: 12.w,
+              top: 12.h,
+              bottom: 12.h,
+              right: onDelete != null ? 2.w : 12.w,
+            ),
             decoration: BoxDecoration(
               color: isCurrentPlaying ? const Color(0xFFE6F6F4) : Colors.white,
               borderRadius: BorderRadius.circular(16.r),
@@ -45,129 +52,214 @@ class AudioListCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                /// Thumbnail with Equalizer if playing
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.asset(
-                        item.imagePath,
-                        width: 65.w,
-                        height: 65.h,
-                        fit: BoxFit.cover,
-                      ),
+                    /// Thumbnail with Equalizer if playing
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                              ? Image.network(
+                                  item.imagePath,
+                                  width: 65.w,
+                                  height: 65.h,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    width: 65.w,
+                                    height: 65.h,
+                                    color: const Color(0xFFE0F2F1),
+                                    child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                                  ),
+                                )
+                              : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                                  ? Image.asset(
+                                      item.imagePath,
+                                      width: 65.w,
+                                      height: 65.h,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        width: 65.w,
+                                        height: 65.h,
+                                        color: const Color(0xFFE0F2F1),
+                                        child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 65.w,
+                                      height: 65.h,
+                                      color: const Color(0xFFE0F2F1),
+                                      child: Icon(Icons.music_note_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                                    )),
+                        ),
+                        if (isCurrentPlaying)
+                          Container(
+                            padding: EdgeInsets.all(3.r),
+                            margin: EdgeInsets.all(4.r),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(160),
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Icon(
+                              Icons.bar_chart_rounded,
+                              color: ConstColor.primaryTeal,
+                              size: 14.sp,
+                            ),
+                          ),
+                      ],
                     ),
-                    if (isCurrentPlaying)
-                      Container(
-                        padding: EdgeInsets.all(3.r),
-                        margin: EdgeInsets.all(4.r),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(160),
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        child: Icon(
-                          Icons.bar_chart_rounded,
-                          color: ConstColor.primaryTeal,
-                          size: 14.sp,
-                        ),
-                      ),
-                  ],
-                ),
 
-                SizedBox(width: 14.w),
+                    SizedBox(width: 14.w),
 
-                /// Title & Duration
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF222222),
-                          fontFamily: 'SFPro',
-                        ),
-                      ),
-                      SizedBox(height: 3.h),
-
-                      /// Subtitle Row (Bibel • 15:45)
-                      Row(
+                    /// Title & Duration
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Bibel",
+                            item.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 11.sp,
-                              color: const Color(0xFF7A7A7A),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF222222),
                               fontFamily: 'SFPro',
                             ),
                           ),
-                          SizedBox(width: 4.w),
-                          Container(
-                            width: 3.w,
-                            height: 3.h,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF8E8E93),
-                              shape: BoxShape.circle,
-                            ),
+                          SizedBox(height: 3.h),
+
+                          /// Subtitle Row (Category • Dynamic Duration)
+                          Row(
+                            children: [
+                              Text(
+                                item.categoryTag.isNotEmpty ? item.categoryTag : "Audio",
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: const Color(0xFF7A7A7A),
+                                  fontFamily: 'SFPro',
+                                ),
+                              ),
+                              Builder(builder: (context) {
+                                final isCurrent = audioService.currentPlayingId.value == item.id;
+                                final displayDuration = (isCurrent && audioService.duration.value.inSeconds > 0)
+                                    ? audioService.formatDuration(audioService.duration.value)
+                                    : item.durationText;
+
+                                if (displayDuration.isEmpty) return const SizedBox.shrink();
+
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(width: 4.w),
+                                    Container(
+                                      width: 3.w,
+                                      height: 3.h,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF8E8E93),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      displayDuration,
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: const Color(0xFF7A7A7A),
+                                        fontFamily: 'SFPro',
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ],
                           ),
-                          SizedBox(width: 4.w),
+
+                          SizedBox(height: 4.h),
+
                           Text(
-                            item.durationText,
+                            item.subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: const Color(0xFF7A7A7A),
+                              color: const Color(0xFF8E8E93),
                               fontFamily: 'SFPro',
                             ),
                           ),
                         ],
                       ),
+                    ),
 
-                      SizedBox(height: 4.h),
+                    SizedBox(width: 18.w),
 
-                      Text(
-                        item.subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          color: const Color(0xFF8E8E93),
-                          fontFamily: 'SFPro',
+                    /// Play/Pause Circular Action Button
+                    GestureDetector(
+                      onTap: () {
+                        audioService.playAudio(url: item.audioUrl, id: item.id);
+                      },
+                      child: Container(
+                        width: 36.w,
+                        height: 36.h,
+                        decoration: BoxDecoration(
+                          color: isCurrentPlaying ? ConstColor.primaryTeal : const Color(0xFFE0F2F1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isCurrentPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                            color: isCurrentPlaying ? Colors.white : ConstColor.primaryTeal,
+                            size: 20.sp,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(width: 10.w),
-
-                /// Play/Pause Circular Action Button
-                GestureDetector(
-                  onTap: () {
-                    audioService.playAudio(url: item.audioUrl, id: item.id);
-                  },
-                  child: Container(
-                    width: 36.w,
-                    height: 36.h,
-                    decoration: BoxDecoration(
-                      color: isCurrentPlaying ? ConstColor.primaryTeal : const Color(0xFFE0F2F1),
-                      shape: BoxShape.circle,
                     ),
-                    child: Center(
-                      child: Icon(
-                        isCurrentPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                        color: isCurrentPlaying ? Colors.white : ConstColor.primaryTeal,
-                        size: 20.sp,
+
+                    /// Optional Three-Dot Menu at the far right
+                    if (onDelete != null) ...[
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          color: const Color(0xFF8E8E93),
+                          size: 22.sp,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        onSelected: (value) {
+                          if (value == 'delete') {
+                            onDelete?.call();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: const Color(0xFFFF4D4D),
+                                  size: 20.sp,
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "Delete",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFFF4D4D),
+                                    fontFamily: 'SFPro',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
           ),
         );
       }),

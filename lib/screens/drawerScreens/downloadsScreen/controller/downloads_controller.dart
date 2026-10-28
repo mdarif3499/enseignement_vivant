@@ -1,12 +1,15 @@
 import 'package:get/get.dart';
-import 'package:enseignement_vivant/constant/app_assert_image.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/screens/homeScreen/audioScreen/model/audio_item_model.dart';
+import 'package:enseignement_vivant/services/download/download_service.dart';
 
 class DownloadsController extends GetxController {
+  final DownloadService _downloadService = DownloadService.instance;
+
   final RxString selectedCategory = ConstString.all.obs;
 
-  final RxList<AudioItemModel> allDownloads = <AudioItemModel>[].obs;
+  RxList<DownloadedMediaModel> get downloadedItems => _downloadService.downloadedItems;
+
   final RxList<AudioItemModel> filteredDownloads = <AudioItemModel>[].obs;
 
   final List<String> categories = [
@@ -14,75 +17,15 @@ class DownloadsController extends GetxController {
     ConstString.prayer,
     ConstString.audio,
     ConstString.encouragement,
+    ConstString.teachings,
   ];
-
-  static const String demoAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
 
   @override
   void onInit() {
     super.onInit();
-    loadDownloads();
-  }
-
-  void loadDownloads() {
-    final list = [
-      AudioItemModel(
-        id: '1',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '2',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem1,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '3',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.encouragement,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem2,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '4',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem3,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '5',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem4,
-        audioUrl: demoAudioUrl,
-      ),
-      AudioItemModel(
-        id: '6',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.encouragement,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem5,
-        audioUrl: demoAudioUrl,
-      ),
-    ];
-
-    allDownloads.assignAll(list);
+    _downloadService.loadDownloadedItems();
+    ever(downloadedItems, (_) => _applyFilter());
+    ever(selectedCategory, (_) => _applyFilter());
     _applyFilter();
   }
 
@@ -93,12 +36,31 @@ class DownloadsController extends GetxController {
 
   void _applyFilter() {
     final cat = selectedCategory.value;
+    final convertedList = downloadedItems.map((item) {
+      return AudioItemModel(
+        id: item.id,
+        title: item.title,
+        categoryTag: item.categoryTag,
+        durationText: item.durationText.isNotEmpty ? item.durationText : '0:00',
+        subtitle: item.subtitle,
+        imagePath: item.imagePath,
+        audioUrl: item.localFilePath,
+      );
+    }).toList();
+
     if (cat == ConstString.all) {
-      filteredDownloads.assignAll(allDownloads);
+      filteredDownloads.assignAll(convertedList);
     } else {
       filteredDownloads.assignAll(
-        allDownloads.where((item) => item.categoryTag == cat).toList(),
+        convertedList.where((item) => item.categoryTag.toLowerCase() == cat.toLowerCase()).toList(),
       );
+    }
+  }
+
+  Future<void> onDeleteItem(String id) async {
+    final item = downloadedItems.firstWhereOrNull((element) => element.id == id);
+    if (item != null) {
+      await _downloadService.deleteDownloadedItem(item);
     }
   }
 }

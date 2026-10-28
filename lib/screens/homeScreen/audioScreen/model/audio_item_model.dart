@@ -1,3 +1,5 @@
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+
 class AudioItemModel {
   final String id;
   final String title;
@@ -24,4 +26,43 @@ Shape my words, guide my steps, and fill my heart with Your love so that I may b
 
 In Jesus' name, Amen.''',
   });
+
+  factory AudioItemModel.fromJson(Map<String, dynamic> json) {
+    String image = json['coverImage']?.toString() ?? json['image']?.toString() ?? '';
+    if (image.isNotEmpty) {
+      if (image.startsWith('http://') || image.startsWith('https://')) {
+        // already full URL
+      } else if (image.startsWith('/files/')) {
+        image = "${AppApiEndPoint.instance.domain}$image";
+      } else if (image.startsWith('/')) {
+        image = "${AppApiEndPoint.instance.imageBaseUrl}$image";
+      } else {
+        image = "${AppApiEndPoint.instance.imageBaseUrl}/$image";
+      }
+    }
+
+    String audio = json['audio']?.toString() ?? '';
+    if (audio.isNotEmpty) {
+      if (audio.startsWith('http://') || audio.startsWith('https://')) {
+        // already full URL
+      } else if (audio.startsWith('/files/')) {
+        audio = "${AppApiEndPoint.instance.domain}$audio";
+      } else if (audio.startsWith('/')) {
+        audio = "${AppApiEndPoint.instance.imageBaseUrl}$audio";
+      } else {
+        audio = "${AppApiEndPoint.instance.imageBaseUrl}/$audio";
+      }
+    }
+
+    return AudioItemModel(
+      id: json['_id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      categoryTag: json['category']?.toString() ?? 'Prayer',
+      durationText: json['duration']?.toString().trim() ?? '',
+      subtitle: json['description']?.toString() ?? '',
+      imagePath: image,
+      audioUrl: audio,
+      contentText: json['prayer']?.toString() ?? '',
+    );
+  }
 }

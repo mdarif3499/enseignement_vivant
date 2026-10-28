@@ -6,6 +6,8 @@ import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/constant/app_assert_image.dart';
 import 'package:enseignement_vivant/constant/app_assert_icons.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
+import 'package:enseignement_vivant/screens/homeScreen/profileTab/controller/profile_controller.dart';
+import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -41,59 +43,84 @@ class CustomDrawer extends StatelessWidget {
               Gap(height: 16.h),
 
               /// User Profile Card
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: ConstColor.primaryTeal,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22.r,
-                      backgroundColor: Colors.white24,
-                      child: CircleAvatar(
-                        radius: 20.r,
-                        backgroundColor: const Color(0xFFE0F2F1),
-                        child: Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 24.sp),
+              Obx(() {
+                final profileController = Get.isRegistered<ProfileController>()
+                    ? Get.find<ProfileController>()
+                    : Get.put(ProfileController());
+
+                final userName = profileController.name.value.isNotEmpty
+                    ? profileController.name.value
+                    : (StorageServices.instance.getUserName().isNotEmpty
+                        ? StorageServices.instance.getUserName()
+                        : "User");
+
+                final userEmail = profileController.email.value.isNotEmpty
+                    ? profileController.email.value
+                    : StorageServices.instance.getUserEmail();
+
+                final userImage = profileController.profileImage.value.isNotEmpty
+                    ? profileController.profileImage.value
+                    : StorageServices.instance.getProfileImage();
+
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    color: ConstColor.primaryTeal,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22.r,
+                        backgroundColor: Colors.white24,
+                        child: CircleAvatar(
+                          radius: 20.r,
+                          backgroundColor: const Color(0xFFE0F2F1),
+                          backgroundImage: userImage.isNotEmpty ? NetworkImage(userImage) : null,
+                          child: userImage.isEmpty
+                              ? Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 24.sp)
+                              : null,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Sara",
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'SFPro',
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: 'SFPro',
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            "sarahashem@gmail.com",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.white70,
-                              fontFamily: 'SFPro',
+                            SizedBox(height: 2.h),
+                            Text(
+                              userEmail,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: Colors.white70,
+                                fontFamily: 'SFPro',
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white,
-                      size: 22.sp,
-                    ),
-                  ],
-                ),
-              ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: Colors.white,
+                        size: 22.sp,
+                      ),
+                    ],
+                  ),
+                );
+              }),
 
               Gap(height: 20.h),
 
@@ -151,7 +178,8 @@ class CustomDrawer extends StatelessWidget {
                 iconPath: ConstIcons.logoutIcon,
                 title: ConstString.logout.tr,
                 isLogout: true,
-                onTap: () {
+                onTap: () async {
+                  await StorageServices.instance.storageClear();
                   Get.offAllNamed(AppRoutes.signInScreen);
                 },
               ),

@@ -10,12 +10,34 @@ import 'package:enseignement_vivant/widgers/custom_text_Field/customtextfield.da
 import 'package:enseignement_vivant/widgers/custombutton/custombutton.dart';
 import 'controller/sign_in_controller.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
   @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignInController());
+    final controller = Get.find<SignInController>();
 
     return Scaffold(
       backgroundColor: ConstColor.primaryBackground,
@@ -150,7 +172,7 @@ class SignInScreen extends StatelessWidget {
 
                 /// Email Field
                 CustomTextField(
-                  controller: controller.emailController,
+                  controller: _emailController,
                   hintText: ConstString.emailAddress.tr,
                   isEmail: true,
                   borderRadius: 28,
@@ -182,7 +204,7 @@ class SignInScreen extends StatelessWidget {
                 /// Password Field
                 Obx(
                   () => CustomTextField(
-                    controller: controller.passwordController,
+                    controller: _passwordController,
                     hintText: "•••••••••",
                     isPassWord: true,
                     borderRadius: 28,
@@ -239,7 +261,12 @@ class SignInScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     isLoading: controller.isLoading.value,
-                    onTap: controller.isLoading.value ? null : controller.onSignIn,
+                    onTap: controller.isLoading.value
+                        ? null
+                        : () => controller.onSignIn(
+                              _emailController.text,
+                              _passwordController.text,
+                            ),
                   ),
                 ),
 

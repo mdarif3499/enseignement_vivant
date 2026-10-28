@@ -15,7 +15,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ForgotPasswordController());
+    final controller = Get.find<ForgotPasswordController>();
 
     return Scaffold(
       backgroundColor: ConstColor.primaryBackground,
@@ -23,7 +23,8 @@ class ForgotPasswordScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: ConstColor.titleColor),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: ConstColor.titleColor),
           onPressed: () => Get.back(),
         ),
       ),
@@ -119,7 +120,9 @@ class ForgotPasswordScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     isLoading: controller.isLoading.value,
-                    onTap: controller.isLoading.value ? null : controller.onRequestOtp,
+                    onTap: controller.isLoading.value
+                        ? null
+                        : controller.onRequestOtp,
                   ),
                 ),
 

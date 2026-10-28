@@ -10,12 +10,34 @@ import 'package:enseignement_vivant/widgers/custom_text_Field/customtextfield.da
 import 'package:enseignement_vivant/widgers/custombutton/custombutton.dart';
 import 'controller/resetPasswordController.dart';
 
-class ResetPasswordScreen extends StatelessWidget {
+class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  late final TextEditingController _passwordController;
+  late final TextEditingController _confirmPasswordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ResetPasswordController());
+    final controller = Get.find<ResetPasswordController>();
 
     return Scaffold(
       backgroundColor: ConstColor.primaryBackground,
@@ -83,7 +105,7 @@ class ResetPasswordScreen extends StatelessWidget {
                 /// New Password Field
                 Obx(
                   () => CustomTextField(
-                    controller: controller.passwordController,
+                    controller: _passwordController,
                     hintText: "•••••••••",
                     isPassWord: true,
                     borderRadius: 28,
@@ -124,11 +146,11 @@ class ResetPasswordScreen extends StatelessWidget {
                 /// Confirm New Password Field
                 Obx(
                   () => CustomTextField(
-                    controller: controller.confirmPasswordController,
+                    controller: _confirmPasswordController,
                     hintText: "•••••••••",
                     isPassWord: true,
                     isPassWordSecondValidation: true,
-                    isPassWordSecondValidationController: controller.passwordController,
+                    isPassWordSecondValidationController: _passwordController,
                     borderRadius: 28,
                     fillColor: const Color(0xFFEFEFF4),
                     obscureText: controller.obscureConfirmPassword.value,
@@ -164,7 +186,12 @@ class ResetPasswordScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     isLoading: controller.isLoading.value,
-                    onTap: controller.isLoading.value ? null : controller.onResetPassword,
+                    onTap: controller.isLoading.value
+                        ? null
+                        : () => controller.onResetPassword(
+                              _passwordController.text,
+                              _confirmPasswordController.text,
+                            ),
                   ),
                 ),
 

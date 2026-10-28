@@ -15,8 +15,8 @@ class LanguageScreenController extends GetxController {
     tempSelectedLangCode.value = code;
   }
 
-  void saveLanguage() {
-    languageController.changeLanguage(tempSelectedLangCode.value);
+  Future<void> saveLanguage() async {
+    await languageController.changeLanguage(tempSelectedLangCode.value);
     Get.back();
   }
 }

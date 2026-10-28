@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/core/localization/language_controller.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
 import 'package:enseignement_vivant/routes/app_routes_file.dart';
+import 'package:enseignement_vivant/routes/authBindings.dart';
 import 'core/localization/app_translations.dart';
 import 'core/localization/localization_service.dart';
 
@@ -32,9 +33,10 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
+        initialBinding: AppBindings(),
         translations: AppTranslations(),
         locale: savedLocale,
-        fallbackLocale: LocalizationService.french,
+        fallbackLocale: LocalizationService.english,
         initialRoute: AppRoutes.splashScreen,
         getPages: appRouteFile,
         defaultTransition: Transition.fadeIn,

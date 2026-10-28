@@ -34,34 +34,75 @@ import 'package:enseignement_vivant/screens/homeScreen/notificationScreen/notifi
 import 'package:enseignement_vivant/screens/homeScreen/mainScreen/mainScreen.dart';
 
 List<GetPage> appRouteFile = <GetPage>[
-  GetPage(name: AppRoutes.splashScreen, page: () => const SplashScreen(), binding: SplashBinding()),
-  GetPage(name: AppRoutes.signInScreen, page: () => const SignInScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.signUpScreen, page: () => const SignUpScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.forgotPasswordScreen, page: () => const ForgotPasswordScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.forgotVerifyOtpScreen, page: () => const ForgotVerifyOtpScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.resetPasswordScreen, page: () => const ResetPasswordScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.prayersScreen, page: () => const PrayersScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.prayerDetailScreen, page: () => const PrayerDetailScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.encouragementsScreen, page: () => const EncouragementsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.encouragementDetailScreen, page: () => const EncouragementDetailScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.teachingsScreen, page: () => const TeachingsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.teachingDetailScreen, page: () => const TeachingDetailScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.imagesScreen, page: () => const ImagesScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.imageDetailScreen, page: () => const ImageDetailScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.verseOfDayScreen, page: () => const VerseOfDayScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.audioScreen, page: () => const AudioScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.audioDetailScreen, page: () => const AudioDetailScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.downloadsScreen, page: () => const DownloadsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.languageScreen, page: () => const LanguageScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.settingsScreen, page: () => const SettingsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.notificationSettingScreen, page: () => const NotificationSettingScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.changePasswordScreen, page: () => const ChangePasswordScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.termsScreen, page: () => const TermsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.privacyPolicyScreen, page: () => const PrivacyPolicyScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.helpSupportScreen, page: () => const HelpSupportScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.aboutUsScreen, page: () => const AboutUsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.deleteAccountScreen, page: () => const DeleteAccountScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.editProfileScreen, page: () => const EditProfileScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.notificationsScreen, page: () => const NotificationsScreen(), binding: AuthBindings()),
-  GetPage(name: AppRoutes.mainScreen, page: () => const MainScreen(), binding: AuthBindings()),
+  GetPage(
+      name: AppRoutes.splashScreen,
+      page: () => const SplashScreen(),
+      binding: SplashBinding()),
+  GetPage(
+      name: AppRoutes.signInScreen,
+      page: () => const SignInScreen(),
+      binding: SignInBinding()),
+  GetPage(
+      name: AppRoutes.signUpScreen,
+      page: () => const SignUpScreen(),
+      binding: SignUpBinding()),
+  GetPage(
+      name: AppRoutes.forgotPasswordScreen,
+      page: () => const ForgotPasswordScreen(),
+      binding: ForgotPasswordBinding()),
+  GetPage(
+      name: AppRoutes.forgotVerifyOtpScreen,
+      page: () => const ForgotVerifyOtpScreen(),
+      binding: ForgotVerifyOtpBinding()),
+  GetPage(
+      name: AppRoutes.resetPasswordScreen,
+      page: () => const ResetPasswordScreen(),
+      binding: ResetPasswordBinding()),
+  GetPage(name: AppRoutes.prayersScreen, page: () => const PrayersScreen()),
+  GetPage(
+      name: AppRoutes.prayerDetailScreen,
+      page: () => const PrayerDetailScreen()),
+  GetPage(
+      name: AppRoutes.encouragementsScreen,
+      page: () => const EncouragementsScreen()),
+  GetPage(
+      name: AppRoutes.encouragementDetailScreen,
+      page: () => const EncouragementDetailScreen()),
+  GetPage(name: AppRoutes.teachingsScreen, page: () => const TeachingsScreen()),
+  GetPage(
+      name: AppRoutes.teachingDetailScreen,
+      page: () => const TeachingDetailScreen()),
+  GetPage(name: AppRoutes.imagesScreen, page: () => const ImagesScreen()),
+  GetPage(
+      name: AppRoutes.imageDetailScreen, page: () => const ImageDetailScreen()),
+  GetPage(
+      name: AppRoutes.verseOfDayScreen, page: () => const VerseOfDayScreen()),
+  GetPage(name: AppRoutes.audioScreen, page: () => const AudioScreen()),
+  GetPage(
+      name: AppRoutes.audioDetailScreen, page: () => const AudioDetailScreen()),
+  GetPage(name: AppRoutes.downloadsScreen, page: () => const DownloadsScreen()),
+  GetPage(name: AppRoutes.languageScreen, page: () => const LanguageScreen()),
+  GetPage(name: AppRoutes.settingsScreen, page: () => const SettingsScreen()),
+  GetPage(
+      name: AppRoutes.notificationSettingScreen,
+      page: () => const NotificationSettingScreen()),
+  GetPage(
+      name: AppRoutes.changePasswordScreen,
+      page: () => const ChangePasswordScreen()),
+  GetPage(name: AppRoutes.termsScreen, page: () => const TermsScreen()),
+  GetPage(
+      name: AppRoutes.privacyPolicyScreen,
+      page: () => const PrivacyPolicyScreen()),
+  GetPage(
+      name: AppRoutes.helpSupportScreen, page: () => const HelpSupportScreen()),
+  GetPage(name: AppRoutes.aboutUsScreen, page: () => const AboutUsScreen()),
+  GetPage(
+      name: AppRoutes.deleteAccountScreen,
+      page: () => const DeleteAccountScreen()),
+  GetPage(
+      name: AppRoutes.editProfileScreen, page: () => const EditProfileScreen()),
+  GetPage(
+      name: AppRoutes.notificationsScreen,
+      page: () => const NotificationsScreen()),
+  GetPage(name: AppRoutes.mainScreen, page: () => const MainScreen()),
 ];

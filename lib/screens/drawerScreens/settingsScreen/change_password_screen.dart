@@ -150,10 +150,13 @@ class ChangePasswordScreen extends StatelessWidget {
               const Spacer(),
 
               /// Save Changes Button
-              CustomButton(
-                text: ConstString.saveChanges.tr,
-                backgroundColor: ConstColor.primaryTeal,
-                onTap: controller.changePassword,
+              Obx(
+                () => CustomButton(
+                  text: ConstString.saveChanges.tr,
+                  backgroundColor: ConstColor.primaryTeal,
+                  isLoading: controller.isLoading.value,
+                  onTap: controller.isLoading.value ? null : controller.changePassword,
+                ),
               ),
 
               Gap(height: 16.h),

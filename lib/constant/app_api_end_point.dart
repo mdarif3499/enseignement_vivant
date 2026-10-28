@@ -7,7 +7,7 @@ class AppApiEndPoint {
   static AppApiEndPoint get instance => _instance;
   final String domain = _getDomain();
   final String baseUrl = "${_getDomain()}/api/v1";
-  final String imageBaseUrl = _getDomain();
+  final String imageBaseUrl = "${_getDomain()}/files";
 
   String login = "/auth/login";
   String userSignUp = "/user";
@@ -19,12 +19,17 @@ class AppApiEndPoint {
   String authResetPassword = "/auth/reset-password";
   String changePassword = "/auth/change-password";
   String updateProfile = "/user/profile";
-  String deleteAccount = "/user/delete";
+  String deleteAccount = "/user/account-delete";
+  String prayer = "/prayer";
+  String audio = "/audio";
+  String teaching = "/teaching";
+  String imageEndpoint = "/image";
+  String encouragement = "/encouragement";
 }
 
 String _getDomain() {
-  String liveServer = "http://172.252.13.197:6500";
-  String localServer = "http://172.252.13.197:6500";
+  String liveServer = "http://10.10.26.164:5010";
+  String localServer = "http://10.10.26.164:5010";
 
   try {
     if (kDebugMode) {

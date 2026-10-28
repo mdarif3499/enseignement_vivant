@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../model/encouragement_model.dart';
+import 'package:enseignement_vivant/screens/homeScreen/encouragementsScreen/model/encouragement_model.dart';
 
 class EncouragementCard extends StatelessWidget {
   final EncouragementModel item;
@@ -38,10 +38,43 @@ class EncouragementCard extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 /// Background Image
-                Image.asset(
-                  item.imagePath,
-                  fit: BoxFit.cover,
-                ),
+                item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                        ? Image.asset(
+                            item.imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                          )),
 
                 /// Dark Bottom Gradient Overlay
                 Container(

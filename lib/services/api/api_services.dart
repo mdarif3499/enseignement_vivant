@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:enseignement_vivant/widgers/custom_snack_bar/app_snack_bar.dart';
 import '../../utils/error_log.dart';
-import '../storage_services/get_storage_services.dart';
 import 'api.dart';
 
 class ApiServices {
@@ -12,7 +10,6 @@ class ApiServices {
   static final ApiServices _instance = ApiServices._privateConstructor();
   static ApiServices get instance => _instance;
 
-  final _storageServices = StorageServices.instance;
   final _snackBar = AppSnackBar.instance;
 
   Future<dynamic> putServices({required String url, dynamic body, int statusCode = 200, Map<String, dynamic>? query}) async {
@@ -38,9 +35,21 @@ class ApiServices {
     }
   }
 
-  Future<dynamic> postServices({required String url, dynamic body, int statusCodeStart = 200, int statusCodeEnd = 299, Map<String, dynamic>? queryParameters}) async {
+  Future<dynamic> postServices({
+    required String url,
+    dynamic body,
+    int statusCodeStart = 200,
+    int statusCodeEnd = 299,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      final dynamic response = await AppApi.instance.sendRequest.post(url, data: body, queryParameters: queryParameters);
+      final dynamic response = await AppApi.instance.sendRequest.post(
+        url,
+        data: body,
+        queryParameters: queryParameters,
+        options: options,
+      );
       if (response.statusCode != null && response.statusCode! >= statusCodeStart && response.statusCode! <= statusCodeEnd) {
         return response.data;
       } else {
@@ -162,8 +171,9 @@ class ApiServices {
 
   dynamic _handleDioError(DioException e) {
     if (e.response != null) {
-      if (e.response?.data != null && e.response?.data["message"] != null) {
-        _snackBar.error("${e.response?.data["message"]}");
+      final responseData = e.response?.data;
+      if (responseData != null && responseData is Map) {
+        return responseData;
       } else {
         _snackBar.error("Server Error: ${e.response?.statusCode}");
       }
@@ -171,6 +181,8 @@ class ApiServices {
       errorLog('api dio exception', e.message ?? e.type.toString());
       if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.unknown) {
         _snackBar.error("Cannot connect to server. Please check IP/Network.");
+      } else if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout || e.type == DioExceptionType.sendTimeout) {
+        _snackBar.error("Request timed out. Please try again.");
       } else {
         _snackBar.error("API Error: ${e.type}");
       }

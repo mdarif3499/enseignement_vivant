@@ -38,77 +38,85 @@ class ProfileTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Top Banner Card (Sara / sarahashem@gmail.com + Edit Pencil)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                decoration: BoxDecoration(
-                  color: ConstColor.primaryTeal,
-                  borderRadius: BorderRadius.circular(20.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ConstColor.primaryTeal.withAlpha(50),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 26.r,
-                      backgroundColor: Colors.white24,
-                      child: CircleAvatar(
-                        radius: 24.r,
-                        backgroundColor: const Color(0xFFE0F2F1),
-                        child: Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+              /// Top Banner Card
+              Obx(
+                () => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: ConstColor.primaryTeal,
+                    borderRadius: BorderRadius.circular(20.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ConstColor.primaryTeal.withAlpha(50),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                    SizedBox(width: 14.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Sara",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'SFPro',
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            "sarahashem@gmail.com",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.white70,
-                              fontFamily: 'SFPro',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed(AppRoutes.editProfileScreen);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(8.r),
-                        decoration: const BoxDecoration(
-                          color: Colors.white24,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.edit_outlined,
-                          color: Colors.white,
-                          size: 18.sp,
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 26.r,
+                        backgroundColor: Colors.white24,
+                        child: CircleAvatar(
+                          radius: 24.r,
+                          backgroundColor: const Color(0xFFE0F2F1),
+                          backgroundImage: controller.profileImage.value.isNotEmpty
+                              ? NetworkImage(controller.profileImage.value)
+                              : null,
+                          child: controller.profileImage.value.isEmpty
+                              ? Icon(Icons.person_rounded,
+                                  color: ConstColor.primaryTeal, size: 28.sp)
+                              : null,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              controller.name.value.isNotEmpty ? controller.name.value : "User",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: 'SFPro',
+                              ),
+                            ),
+                            SizedBox(height: 2.h),
+                            Text(
+                              controller.email.value.isNotEmpty ? controller.email.value : "",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.white70,
+                                fontFamily: 'SFPro',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(AppRoutes.editProfileScreen);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8.r),
+                          decoration: const BoxDecoration(
+                            color: Colors.white24,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white,
+                            size: 18.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -145,7 +153,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.name.value),
+                      key: ValueKey(controller.name.value),
+                      initialValue: controller.name.value,
                       readOnly: true,
                     ),
                   ],
@@ -170,7 +179,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.email.value),
+                      key: ValueKey(controller.email.value),
+                      initialValue: controller.email.value,
                       readOnly: true,
                     ),
                   ],
@@ -195,7 +205,8 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.country.value),
+                      key: ValueKey(controller.country.value),
+                      initialValue: controller.country.value,
                       readOnly: true,
                       suffixIcon: Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -225,10 +236,72 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Gap(height: 6.h),
                     CustomTextField(
-                      controller: TextEditingController(text: controller.phone.value),
+                      key: ValueKey(controller.phone.value),
+                      initialValue: controller.phone.value,
                       readOnly: true,
                     ),
                   ],
+                ),
+              ),
+
+              Gap(height: 20.h),
+
+              /// Downloads Option Tile
+              InkWell(
+                onTap: () {
+                  Get.toNamed(AppRoutes.downloadsScreen);
+                },
+                borderRadius: BorderRadius.circular(16.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(6),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40.w,
+                        height: 40.h,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFE6F6F4),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.download_for_offline_rounded,
+                            color: ConstColor.primaryTeal,
+                            size: 22.sp,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: Text(
+                          ConstString.downloads.tr,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF222222),
+                            fontFamily: 'SFPro',
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: const Color(0xFF8E8E93),
+                        size: 22.sp,
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

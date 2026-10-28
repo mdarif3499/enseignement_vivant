@@ -1,79 +1,83 @@
 import 'package:get/get.dart';
-import 'package:enseignement_vivant/constant/app_assert_image.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import '../model/image_item_model.dart';
 
 class ImagesController extends GetxController {
   final RxString selectedCategory = ConstString.all.obs;
+  final RxBool isLoading = false.obs;
 
   final RxList<ImageItemModel> allImages = <ImageItemModel>[].obs;
   final RxList<ImageItemModel> filteredImages = <ImageItemModel>[].obs;
 
-  final List<String> categories = [
+  final RxList<String> categories = <String>[
     ConstString.all,
     ConstString.prayer,
     ConstString.audio,
     ConstString.encouragement,
-  ];
+  ].obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadImages();
+    fetchImages();
   }
 
-  void loadImages() {
-    final list = [
-      ImageItemModel(
-        id: '1',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.prayer,
-        imagePath: ImageString.tempItem4,
-      ),
-      ImageItemModel(
-        id: '2',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.audio,
-        imagePath: ImageString.tempItem5,
-      ),
-      ImageItemModel(
-        id: '3',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.encouragement,
-        imagePath: ImageString.tempItem6,
-      ),
-      ImageItemModel(
-        id: '4',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.prayer,
-        imagePath: ImageString.tempItem7,
-      ),
-      ImageItemModel(
-        id: '5',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.audio,
-        imagePath: ImageString.tempItem1,
-      ),
-      ImageItemModel(
-        id: '6',
-        title: ConstString.morningMercy.tr,
-        categoryTag: ConstString.encouragement,
-        imagePath: ImageString.tempItem2,
-      ),
-    ];
+  Future<void> fetchImages() async {
+    isLoading.value = true;
+    try {
+      final queryParams = <String, dynamic>{
+        "status": "published",
+      };
 
-    allImages.assignAll(list);
-    filteredImages.assignAll(list);
+      if (selectedCategory.value != ConstString.all &&
+          selectedCategory.value.trim().isNotEmpty) {
+        queryParams["category"] = selectedCategory.value.trim();
+      }
+
+      final response = await ApiServices.instance.getServices(
+        AppApiEndPoint.instance.imageEndpoint,
+        queryParameters: queryParams,
+      );
+
+      if (isClosed) return;
+
+      if (response != null && response['data'] != null && response['data'] is List) {
+        final List listData = response['data'];
+        final items = listData
+            .map((item) => ImageItemModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        allImages.assignAll(items);
+        filteredImages.assignAll(items);
+
+        // Dynamically collect unique categories from items
+        final catSet = <String>{ConstString.all, "Prayer", "Audio", "Encouragement"};
+        for (var item in items) {
+          if (item.categoryTag.isNotEmpty) {
+            catSet.add(item.categoryTag);
+          }
+        }
+        categories.assignAll(catSet.toList());
+      } else {
+        allImages.clear();
+        filteredImages.clear();
+      }
+    } catch (e) {
+      if (isClosed) return;
+      errorLog('Fetch Images Error', e);
+      allImages.clear();
+      filteredImages.clear();
+    } finally {
+      if (!isClosed) isLoading.value = false;
+    }
   }
 
   void filterByCategory(String cat) {
+    if (selectedCategory.value == cat) return;
     selectedCategory.value = cat;
-    if (cat == ConstString.all) {
-      filteredImages.assignAll(allImages);
-    } else {
-      filteredImages.assignAll(
-        allImages.where((item) => item.categoryTag == cat).toList(),
-      );
-    }
+    fetchImages();
   }
 }

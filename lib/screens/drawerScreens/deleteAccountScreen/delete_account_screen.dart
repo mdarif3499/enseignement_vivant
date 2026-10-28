@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pinput/pinput.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
+import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/widgers/custombutton/custombutton.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/delete_account_controller.dart';
@@ -15,33 +15,9 @@ class DeleteAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DeleteAccountController());
 
-    final defaultPinTheme = PinTheme(
-      width: 62.w,
-      height: 52.h,
-      textStyle: TextStyle(
-        fontSize: 20.sp,
-        fontWeight: FontWeight.bold,
-        color: ConstColor.primaryTeal,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
-      ),
-    );
-
-    final focusedPinTheme = defaultPinTheme.copyWith(
-      decoration: defaultPinTheme.decoration!.copyWith(
-        border: Border.all(color: ConstColor.primaryTeal, width: 1.5),
-      ),
-    );
-
-    final submittedPinTheme = defaultPinTheme.copyWith(
-      decoration: defaultPinTheme.decoration!.copyWith(
-        color: Colors.white,
-        border: Border.all(color: ConstColor.primaryTeal, width: 1.5),
-      ),
-    );
+    final userEmail = StorageServices.instance.getUserEmail().isNotEmpty
+        ? StorageServices.instance.getUserEmail()
+        : "";
 
     return Scaffold(
       backgroundColor: ConstColor.primaryBackground,
@@ -82,10 +58,10 @@ class DeleteAccountScreen extends StatelessWidget {
 
               Gap(height: 14.h),
 
-              /// Description Paragraph 2 with bold email
+              /// Description Paragraph 2
               RichText(
                 text: TextSpan(
-                  text: ConstString.deleteAccountDesc2.tr,
+                  text: "${ConstString.deleteAccountDesc2.tr} ",
                   style: TextStyle(
                     fontSize: 13.sp,
                     color: const Color(0xFF555555),
@@ -94,52 +70,23 @@ class DeleteAccountScreen extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                      text: "ha***12@gmail.com",
-                      style: TextStyle(
+                      text: userEmail.isNotEmpty ? userEmail : "",
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF222222),
+                        color: Color(0xFF222222),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              Gap(height: 24.h),
-
-              /// Verification Code Header
-              Text(
-                ConstString.enterVerificationCode.tr,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF222222),
-                  fontFamily: 'SFPro',
-                ),
-              ),
-
-              Gap(height: 12.h),
-
-              /// Pinput OTP Field
-              Center(
-                child: Pinput(
-                  length: 4,
-                  controller: controller.otpController,
-                  defaultPinTheme: defaultPinTheme,
-                  focusedPinTheme: focusedPinTheme,
-                  submittedPinTheme: submittedPinTheme,
-                  onChanged: (val) {
-                    controller.otpCode.value = val;
-                  },
-                ),
-              ),
-
               const Spacer(),
 
-              /// Save Changes / Confirm Delete Button
+              /// Confirm Delete Button
               CustomButton(
-                text: ConstString.saveChanges.tr,
-                backgroundColor: ConstColor.primaryTeal,
-                onTap: controller.confirmDeleteAccount,
+                text: ConstString.accountDelete.tr,
+                backgroundColor: const Color(0xFFFF4D4D),
+                onTap: controller.showPasswordDialog,
               ),
 
               Gap(height: 16.h),

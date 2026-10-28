@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/services/download/download_service.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
-import 'model/encouragement_model.dart';
+import 'package:enseignement_vivant/screens/homeScreen/encouragementsScreen/model/encouragement_model.dart';
 
 class EncouragementDetailScreen extends StatefulWidget {
   const EncouragementDetailScreen({super.key});
@@ -15,17 +19,69 @@ class EncouragementDetailScreen extends StatefulWidget {
 class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
   late EncouragementModel item;
   bool isFavorite = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    item = Get.arguments is EncouragementModel
-        ? Get.arguments as EncouragementModel
-        : EncouragementModel(
-            title: "Hope",
-            subtitle: "A powerful morning prayer to help you start the day with faith and...",
-            imagePath: "assets/temp/item_1.jpg",
-          );
+    final args = Get.arguments;
+    if (args is EncouragementModel) {
+      item = args;
+      if (item.id.isNotEmpty) {
+        fetchSingleEncouragementDetails(item.id);
+      }
+    } else if (args is String && args.isNotEmpty) {
+      item = EncouragementModel(
+        id: args,
+        title: "Loading...",
+        subtitle: "",
+        imagePath: "",
+        contentText: "",
+      );
+      fetchSingleEncouragementDetails(args);
+    } else if (args is Map && args['_id'] != null) {
+      item = EncouragementModel.fromJson(args as Map<String, dynamic>);
+      if (item.id.isNotEmpty) {
+        fetchSingleEncouragementDetails(item.id);
+      }
+    } else {
+      item = EncouragementModel(
+        id: '1',
+        title: "Hope",
+        subtitle: "Word of Encouragement",
+        imagePath: "",
+        contentText: "",
+      );
+    }
+  }
+
+  Future<void> fetchSingleEncouragementDetails(String id) async {
+    if (id.isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiServices.instance.getServices(
+        "${AppApiEndPoint.instance.encouragement}/$id",
+      );
+
+      if (mounted && response != null && response['data'] != null && response['data'] is Map<String, dynamic>) {
+        final freshItem = EncouragementModel.fromJson(response['data'] as Map<String, dynamic>);
+        setState(() {
+          item = freshItem;
+        });
+      }
+    } catch (e) {
+      errorLog("Fetch Single Encouragement Details Error", e);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -41,11 +97,43 @@ class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                /// Background Image
-                Image.asset(
-                  item.imagePath,
-                  fit: BoxFit.cover,
-                ),
+                item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                        ? Image.asset(
+                            item.imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF1E1B3A), Color(0xFF0F0D24)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                          )),
 
                 /// Gradient Overlay
                 Container(
@@ -93,26 +181,53 @@ class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
                         Row(
                           children: [
                             /// Download Button
-                            GestureDetector(
-                              onTap: () {
-                                // Handle download
-                              },
-                              child: Container(
-                                width: 38.w,
-                                height: 38.h,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withAlpha(40),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.file_download_outlined,
-                                    color: Colors.white,
-                                    size: 20.sp,
+                            Obx(() {
+                              final downloadService = DownloadService.instance;
+                              final isDownloaded = downloadService.isDownloaded(item.id);
+                              final isDownloading = downloadService.isDownloading(item.id);
+
+                              return GestureDetector(
+                                onTap: () {
+                                  if (!isDownloaded && !isDownloading) {
+                                    downloadService.startDownload(
+                                      id: item.id,
+                                      title: item.title,
+                                      subtitle: item.subtitle,
+                                      categoryTag: item.categoryTag,
+                                      imagePath: item.imagePath,
+                                      downloadUrl: item.imagePath,
+                                      durationText: '',
+                                      mediaType: 'IMAGE',
+                                    );
+                                  }
+                                },
+                                child: Container(
+                                  width: 38.w,
+                                  height: 38.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withAlpha(40),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: isDownloading
+                                        ? SizedBox(
+                                            width: 18.w,
+                                            height: 18.h,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                              value: downloadService.downloadProgress[item.id],
+                                            ),
+                                          )
+                                        : Icon(
+                                            isDownloaded ? Icons.download_done_rounded : Icons.file_download_outlined,
+                                            color: isDownloaded ? ConstColor.primaryTeal : Colors.white,
+                                            size: 20.sp,
+                                          ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
 
                             SizedBox(width: 10.w),
 
