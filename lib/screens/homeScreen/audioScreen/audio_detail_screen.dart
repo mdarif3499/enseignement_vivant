@@ -8,6 +8,7 @@ import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/audio_service/audio_service_controller.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
 import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
+import 'package:enseignement_vivant/widgers/comment_bottom_sheet/comment_bottom_sheet.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/audio_screen_controller.dart';
@@ -409,6 +410,17 @@ class _AudioDetailScreenState extends State<AudioDetailScreen> {
                               ),
                       );
                     }),
+                    SizedBox(width: 32.w),
+                    GestureDetector(
+                      onTap: () {
+                        CommentBottomSheet.show(context, postId: item.id, postType: "Audio");
+                      },
+                      child: Icon(
+                        Icons.mode_comment_outlined,
+                        color: const Color(0xFF48484A),
+                        size: 20.sp,
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
 import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
+import 'package:enseignement_vivant/widgers/comment_bottom_sheet/comment_bottom_sheet.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'model/image_item_model.dart';
 
@@ -213,6 +214,30 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
                           ),
                         );
                       }),
+
+                      SizedBox(width: 10.w),
+
+                      /// Comment Button
+                      GestureDetector(
+                        onTap: () {
+                          CommentBottomSheet.show(context, postId: item.id, postType: "Image");
+                        },
+                        child: Container(
+                          width: 38.w,
+                          height: 38.h,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(60),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.mode_comment_outlined,
+                              color: Colors.white,
+                              size: 18.sp,
+                            ),
+                          ),
+                        ),
+                      ),
 
                       SizedBox(width: 10.w),
 

@@ -19,11 +19,11 @@ class VerseOfDayController extends GetxController {
   Future<void> fetchVersesAndImages() async {
     isLoading.value = true;
     try {
-      // 1. Fetch Published Images API
+      // 1. Fetch Scheduled Images API
       final imagesResponse = await ApiServices.instance.getServices(
         AppApiEndPoint.instance.imageEndpoint,
         queryParameters: {
-          "status": "publish",
+          "status": "scheduled",
         },
       );
 
