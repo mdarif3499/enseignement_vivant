@@ -41,12 +41,38 @@ class FavoriteItemCard extends StatelessWidget {
               /// Item Thumbnail
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(
-                  item.imagePath,
-                  width: 65.w,
-                  height: 65.h,
-                  fit: BoxFit.cover,
-                ),
+                child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                    ? Image.network(
+                        item.imagePath,
+                        width: 65.w,
+                        height: 65.h,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 65.w,
+                          height: 65.h,
+                          color: const Color(0xFFE0F2F1),
+                          child: Icon(Icons.favorite_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                        ),
+                      )
+                    : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                        ? Image.asset(
+                            item.imagePath,
+                            width: 65.w,
+                            height: 65.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: 65.w,
+                              height: 65.h,
+                              color: const Color(0xFFE0F2F1),
+                              child: Icon(Icons.favorite_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                            ),
+                          )
+                        : Container(
+                            width: 65.w,
+                            height: 65.h,
+                            color: const Color(0xFFE0F2F1),
+                            child: Icon(Icons.favorite_rounded, color: ConstColor.primaryTeal, size: 28.sp),
+                          )),
               ),
 
               SizedBox(width: 14.w),
@@ -69,35 +95,37 @@ class FavoriteItemCard extends StatelessWidget {
                     ),
                     SizedBox(height: 3.h),
 
-                    /// Subtitle Row (Bibel • 15:45)
+                    /// Subtitle Row (Category • Duration)
                     Row(
                       children: [
                         Text(
-                          "Bibel",
+                          item.categoryTag.isNotEmpty ? item.categoryTag : "Favorite",
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: const Color(0xFF7A7A7A),
                             fontFamily: 'SFPro',
                           ),
                         ),
-                        SizedBox(width: 4.w),
-                        Container(
-                          width: 3.w,
-                          height: 3.h,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF8E8E93),
-                            shape: BoxShape.circle,
+                        if (item.durationText.isNotEmpty) ...[
+                          SizedBox(width: 4.w),
+                          Container(
+                            width: 3.w,
+                            height: 3.h,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF8E8E93),
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          item.durationText,
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: const Color(0xFF7A7A7A),
-                            fontFamily: 'SFPro',
+                          SizedBox(width: 4.w),
+                          Text(
+                            item.durationText,
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: const Color(0xFF7A7A7A),
+                              fontFamily: 'SFPro',
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
 
@@ -119,20 +147,20 @@ class FavoriteItemCard extends StatelessWidget {
 
               SizedBox(width: 10.w),
 
-              /// Solid Heart Favorite Button
+              /// Solid Heart Favorite Button (Tap to Unfavorite)
               GestureDetector(
                 onTap: onRemoveFavorite,
                 child: Container(
                   width: 36.w,
                   height: 36.h,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE0F2F1),
+                    color: Color(0xFFFFEBEE),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Icon(
                       Icons.favorite_rounded,
-                      color: ConstColor.primaryTeal,
+                      color: Colors.redAccent,
                       size: 18.sp,
                     ),
                   ),

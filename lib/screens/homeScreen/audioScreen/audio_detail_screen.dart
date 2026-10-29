@@ -7,6 +7,7 @@ import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/audio_service/audio_service_controller.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/audio_screen_controller.dart';
@@ -355,36 +356,59 @@ class _AudioDetailScreenState extends State<AudioDetailScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isFavorite = !isFavorite;
-                        });
-                      },
-                      child: Icon(
-                        isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        color: isFavorite ? Colors.redAccent : const Color(0xFF48484A),
-                        size: 20.sp,
-                      ),
-                    ),
+                    Obx(() {
+                      final favoriteService = FavoriteService.instance;
+                      final isFav = favoriteService.isFavorite(item.id);
+
+                      return GestureDetector(
+                        onTap: () {
+                          favoriteService.toggleFavorite(id: item.id, postType: "Audio");
+                        },
+                        child: Icon(
+                          isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFav ? Colors.redAccent : const Color(0xFF48484A),
+                          size: 20.sp,
+                        ),
+                      );
+                    }),
                     SizedBox(width: 32.w),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.file_download_outlined,
-                        color: const Color(0xFF48484A),
-                        size: 20.sp,
-                      ),
-                    ),
-                    SizedBox(width: 32.w),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.share_outlined,
-                        color: const Color(0xFF48484A),
-                        size: 20.sp,
-                      ),
-                    ),
+                    Obx(() {
+                      final downloadService = DownloadService.instance;
+                      final isDownloaded = downloadService.isDownloaded(item.id);
+                      final isDownloading = downloadService.isDownloading(item.id);
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (!isDownloaded && !isDownloading) {
+                            downloadService.startDownload(
+                              id: item.id,
+                              title: item.title,
+                              subtitle: item.subtitle,
+                              categoryTag: item.categoryTag.isNotEmpty ? item.categoryTag : 'Audio',
+                              imagePath: item.imagePath,
+                              downloadUrl: item.audioUrl,
+                              durationText: item.durationText,
+                              mediaType: 'AUDIO',
+                            );
+                          }
+                        },
+                        child: isDownloading
+                            ? SizedBox(
+                                width: 20.w,
+                                height: 20.h,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: ConstColor.primaryTeal,
+                                  value: downloadService.downloadProgress[item.id],
+                                ),
+                              )
+                            : Icon(
+                                isDownloaded ? Icons.download_done_rounded : Icons.file_download_outlined,
+                                color: isDownloaded ? ConstColor.primaryTeal : const Color(0xFF48484A),
+                                size: 20.sp,
+                              ),
+                      );
+                    }),
                   ],
                 ),
               ),

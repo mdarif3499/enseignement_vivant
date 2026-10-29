@@ -1,4 +1,5 @@
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 
 class TeachingModel {
   final String id;
@@ -9,6 +10,7 @@ class TeachingModel {
   final String audioUrl;
   final String categoryTag;
   final String contentText;
+  final bool isFavorite;
 
   TeachingModel({
     required this.id,
@@ -19,6 +21,7 @@ class TeachingModel {
     required this.audioUrl,
     this.categoryTag = 'TEACHING',
     this.contentText = '',
+    this.isFavorite = false,
   });
 
   factory TeachingModel.fromJson(Map<String, dynamic> json) {
@@ -48,8 +51,14 @@ class TeachingModel {
       }
     }
 
+    final isFav = json['isFavorite'] == true || json['isFav'] == true;
+    final modelId = json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    if (modelId.isNotEmpty) {
+      FavoriteService.instance.seedFavorite(modelId, isFav);
+    }
+
     return TeachingModel(
-      id: json['_id']?.toString() ?? '',
+      id: modelId,
       title: json['name']?.toString() ?? json['title']?.toString() ?? '',
       durationText: json['duration']?.toString().trim().isNotEmpty == true
           ? json['duration'].toString().trim()
@@ -59,6 +68,7 @@ class TeachingModel {
       audioUrl: audio,
       categoryTag: 'TEACHING',
       contentText: json['prayer']?.toString() ?? json['content']?.toString() ?? '',
+      isFavorite: isFav,
     );
   }
 }

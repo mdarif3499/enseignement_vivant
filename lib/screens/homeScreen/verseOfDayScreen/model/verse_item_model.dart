@@ -4,6 +4,7 @@ class VerseItemModel {
   final String verseText;
   final String verseReference;
   final String imagePath;
+  final bool isFavorite;
 
   VerseItemModel({
     required this.id,
@@ -11,5 +12,6 @@ class VerseItemModel {
     required this.verseText,
     required this.verseReference,
     required this.imagePath,
+    this.isFavorite = false,
   });
 }

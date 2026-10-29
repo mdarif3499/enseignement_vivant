@@ -25,6 +25,9 @@ class AppApiEndPoint {
   String teaching = "/teaching";
   String imageEndpoint = "/image";
   String encouragement = "/encouragement";
+  String verseEndpoint = "/verse";
+  String favoriteEndpoint = "/favorite";
+  String notificationEndpoint = "/notification";
 }
 
 String _getDomain() {

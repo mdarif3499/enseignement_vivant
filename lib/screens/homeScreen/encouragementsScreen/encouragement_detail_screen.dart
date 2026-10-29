@@ -5,6 +5,7 @@ import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'package:enseignement_vivant/screens/homeScreen/encouragementsScreen/model/encouragement_model.dart';
@@ -232,28 +233,31 @@ class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
                             SizedBox(width: 10.w),
 
                             /// Favorite Button
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isFavorite = !isFavorite;
-                                });
-                              },
-                              child: Container(
-                                width: 38.w,
-                                height: 38.h,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withAlpha(40),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                    color: isFavorite ? Colors.redAccent : Colors.white,
-                                    size: 20.sp,
+                            Obx(() {
+                              final favoriteService = FavoriteService.instance;
+                              final isFav = favoriteService.isFavorite(item.id);
+
+                              return GestureDetector(
+                                onTap: () {
+                                  favoriteService.toggleFavorite(id: item.id, postType: "Encouragement");
+                                },
+                                child: Container(
+                                  width: 38.w,
+                                  height: 38.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withAlpha(40),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                      color: isFav ? Colors.redAccent : Colors.white,
+                                      size: 20.sp,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ],
                         ),
                       ],

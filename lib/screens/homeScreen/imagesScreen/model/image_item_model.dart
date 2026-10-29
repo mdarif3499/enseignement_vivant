@@ -1,4 +1,5 @@
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 
 class ImageItemModel {
   final String id;
@@ -6,6 +7,7 @@ class ImageItemModel {
   final String categoryTag;
   final String imagePath;
   final String quoteText;
+  final bool isFavorite;
 
   ImageItemModel({
     required this.id,
@@ -13,6 +15,7 @@ class ImageItemModel {
     required this.categoryTag,
     required this.imagePath,
     this.quoteText = '',
+    this.isFavorite = false,
   });
 
   factory ImageItemModel.fromJson(Map<String, dynamic> json) {
@@ -29,12 +32,19 @@ class ImageItemModel {
       }
     }
 
+    final isFav = json['isFavorite'] == true || json['isFav'] == true;
+    final modelId = json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    if (modelId.isNotEmpty) {
+      FavoriteService.instance.seedFavorite(modelId, isFav);
+    }
+
     return ImageItemModel(
-      id: json['_id']?.toString() ?? '',
+      id: modelId,
       title: json['title']?.toString() ?? '',
       categoryTag: json['category']?.toString() ?? 'Prayer',
       imagePath: img,
       quoteText: json['caption']?.toString() ?? json['title']?.toString() ?? '',
+      isFavorite: isFav,
     );
   }
 }

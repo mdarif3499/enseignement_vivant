@@ -1,4 +1,5 @@
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 
 class AudioItemModel {
   final String id;
@@ -9,6 +10,7 @@ class AudioItemModel {
   final String imagePath;
   final String audioUrl;
   final String contentText;
+  final bool isFavorite;
 
   AudioItemModel({
     required this.id,
@@ -25,6 +27,7 @@ Lead me in Your wisdom. Quiet the noise within me, and let Your peace be the fir
 Shape my words, guide my steps, and fill my heart with Your love so that I may be a light to others.
 
 In Jesus' name, Amen.''',
+    this.isFavorite = false,
   });
 
   factory AudioItemModel.fromJson(Map<String, dynamic> json) {
@@ -54,8 +57,14 @@ In Jesus' name, Amen.''',
       }
     }
 
+    final isFav = json['isFavorite'] == true || json['isFav'] == true;
+    final modelId = json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    if (modelId.isNotEmpty) {
+      FavoriteService.instance.seedFavorite(modelId, isFav);
+    }
+
     return AudioItemModel(
-      id: json['_id']?.toString() ?? '',
+      id: modelId,
       title: json['title']?.toString() ?? '',
       categoryTag: json['category']?.toString() ?? 'Prayer',
       durationText: json['duration']?.toString().trim() ?? '',
@@ -63,6 +72,7 @@ In Jesus' name, Amen.''',
       imagePath: image,
       audioUrl: audio,
       contentText: json['prayer']?.toString() ?? '',
+      isFavorite: isFav,
     );
   }
 }
