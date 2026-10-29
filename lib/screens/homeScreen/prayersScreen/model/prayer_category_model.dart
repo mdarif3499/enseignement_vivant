@@ -1,4 +1,5 @@
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 
 class PrayerCategoryModel {
   final String id;
@@ -10,6 +11,7 @@ class PrayerCategoryModel {
   final String audioUrl;
   final String duration;
   final String status;
+  final bool isFavorite;
 
   String get imagePath => coverImage;
 
@@ -23,6 +25,7 @@ class PrayerCategoryModel {
     this.audioUrl = '',
     this.duration = '',
     this.status = '',
+    this.isFavorite = false,
   });
 
   factory PrayerCategoryModel.fromJson(Map<String, dynamic> json) {
@@ -53,9 +56,14 @@ class PrayerCategoryModel {
     }
 
     final rawPrayer = json['prayer']?.toString() ?? '';
+    final isFav = json['isFavorite'] == true || json['isFav'] == true;
+    final modelId = json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    if (modelId.isNotEmpty) {
+      FavoriteService.instance.seedFavorite(modelId, isFav);
+    }
 
     return PrayerCategoryModel(
-      id: json['_id']?.toString() ?? '',
+      id: modelId,
       title: json['title']?.toString() ?? '',
       subtitle: json['description']?.toString() ?? json['subtitle']?.toString() ?? '',
       coverImage: image,
@@ -64,6 +72,7 @@ class PrayerCategoryModel {
       audioUrl: audio,
       duration: json['duration']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      isFavorite: isFav,
     );
   }
 }

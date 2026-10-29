@@ -7,6 +7,7 @@ import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/constant/app_assert_image.dart';
 import 'package:enseignement_vivant/constant/app_assert_icons.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
+import 'package:enseignement_vivant/screens/homeScreen/verseOfDayScreen/controller/verse_of_day_controller.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'package:enseignement_vivant/screens/homeScreen/homeTab/widget/category_card.dart';
 
@@ -22,21 +23,6 @@ class _HomeTabState extends State<HomeTab> {
   int _currentBannerIndex = 0;
   Timer? _autoScrollTimer;
 
-  final List<Map<String, String>> _bannerItems = [
-    {
-      "verse": "TA PAROLE EST UNE LAMPE\nÀ MES PIEDS, ET UNE LUMIÈRE\nSUR MON SENTIER.",
-      "ref": "PSAUME 119:105",
-    },
-    {
-      "verse": "CAR DIEU A TANT AIMÉ LE MONDE\nQU'IL A DONNÉ SON FILS UNIQUE.",
-      "ref": "JEAN 3:16",
-    },
-    {
-      "verse": "LE SEIGNEUR EST MON BERGER:\nJE NE MANQUERAI DE RIEN.",
-      "ref": "PSAUME 23:1",
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -46,14 +32,21 @@ class _HomeTabState extends State<HomeTab> {
 
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_bannerController.hasClients) {
-        int nextPage = (_currentBannerIndex + 1) % _bannerItems.length;
-        _bannerController.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOutCubic,
-        );
+        final verseController = Get.isRegistered<VerseOfDayController>()
+            ? Get.find<VerseOfDayController>()
+            : Get.put(VerseOfDayController());
+
+        final itemCount = verseController.verseItems.length;
+        if (itemCount > 0) {
+          int nextPage = (_currentBannerIndex + 1) % itemCount;
+          _bannerController.animateToPage(
+            nextPage,
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOutCubic,
+          );
+        }
       }
     });
   }
@@ -67,6 +60,10 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final verseController = Get.isRegistered<VerseOfDayController>()
+        ? Get.find<VerseOfDayController>()
+        : Get.put(VerseOfDayController());
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -145,95 +142,166 @@ class _HomeTabState extends State<HomeTab> {
 
             Gap(height: 12.h),
 
-            /// Auto-scrolling Banner Carousel Card
-            Container(
-              width: double.infinity,
-              height: 180.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
-                image: const DecorationImage(
-                  image: AssetImage(ImageString.homeCardImg),
-                  fit: BoxFit.fill,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  /// PageView Carousel
-                  PageView.builder(
-                    controller: _bannerController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentBannerIndex = index;
-                      });
-                    },
-                    itemCount: _bannerItems.length,
-                    itemBuilder: (context, index) {
-                      final item = _bannerItems[index];
-                      return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              item["verse"]!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'SFPro',
-                                height: 1.4,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            Gap(height: 8.h),
-                            Text(
-                              item["ref"]!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 10.sp,
-                                fontFamily: 'SFPro',
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+            /// Dynamic Auto-scrolling Banner Carousel Card (Verse of the Day API)
+            Obx(() {
+              final verseList = verseController.verseItems;
 
-                  /// Page Indicator Dots
-                  Positioned(
-                    bottom: 12.h,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(_bannerItems.length, (index) {
-                        final isActive = _currentBannerIndex == index;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: EdgeInsets.symmetric(horizontal: 3.w),
-                          width: isActive ? 24.w : 6.w,
-                          height: 6.h,
-                          decoration: BoxDecoration(
-                            color: isActive ? Colors.white : Colors.white38,
-                            borderRadius: BorderRadius.circular(3.r),
-                          ),
-                        );
-                      }),
-                    ),
+              if (verseController.isLoading.value && verseList.isEmpty) {
+                return Container(
+                  width: double.infinity,
+                  height: 180.h,
+                  decoration: BoxDecoration(
+                    color: ConstColor.primaryTeal,
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                ],
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                );
+              }
+
+              if (verseList.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return Container(
+                width: double.infinity,
+                height: 180.h,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      /// PageView Carousel
+                      PageView.builder(
+                        controller: _bannerController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentBannerIndex = index;
+                          });
+                        },
+                        itemCount: verseList.length,
+                        itemBuilder: (context, index) {
+                          final item = verseList[index];
+
+                          return GestureDetector(
+                            onTap: () {
+                              verseController.selectVerse(index);
+                              Get.toNamed(AppRoutes.verseOfDayScreen);
+                            },
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                /// Background Image
+                                item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+                                    ? Image.network(
+                                        item.imagePath,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Container(
+                                          color: ConstColor.primaryTeal,
+                                        ),
+                                      )
+                                    : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                                        ? Image.asset(
+                                            item.imagePath,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) => Container(
+                                              color: ConstColor.primaryTeal,
+                                            ),
+                                          )
+                                        : Container(
+                                            color: ConstColor.primaryTeal,
+                                          )),
+
+                                /// Dark Gradient Overlay for text legibility
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.black.withAlpha(110),
+                                        Colors.black.withAlpha(160),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                ),
+
+                                /// Verse Text Content
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        item.verseText,
+                                        textAlign: TextAlign.center,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'SFPro',
+                                  height: 1.4,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              Gap(height: 8.h),
+                              Text(
+                                item.verseReference,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10.sp,
+                                  fontFamily: 'SFPro',
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ),
+
+              /// Page Indicator Dots
+              Positioned(
+                bottom: 12.h,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(verseList.length, (index) {
+                    final isActive = _currentBannerIndex == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: EdgeInsets.symmetric(horizontal: 3.w),
+                      width: isActive ? 24.w : 6.w,
+                      height: 6.h,
+                      decoration: BoxDecoration(
+                        color: isActive ? Colors.white : Colors.white38,
+                        borderRadius: BorderRadius.circular(3.r),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }),
 
             Gap(height: 40.h),
 

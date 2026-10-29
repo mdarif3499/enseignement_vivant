@@ -1,84 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:enseignement_vivant/constant/app_assert_image.dart';
+import 'package:enseignement_vivant/constant/app_api_end_point.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
+import 'package:enseignement_vivant/services/api/api_services.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
+import 'package:enseignement_vivant/utils/error_log.dart';
 import '../model/favorite_item_model.dart';
 
 class FavoritesController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final RxBool isSearching = false.obs;
+  final RxBool isLoading = false.obs;
 
   final RxString selectedCategory = ConstString.all.obs;
 
   final RxList<FavoriteItemModel> allFavorites = <FavoriteItemModel>[].obs;
   final RxList<FavoriteItemModel> filteredFavorites = <FavoriteItemModel>[].obs;
 
-  final List<String> categories = [
+  final RxList<String> categories = <String>[
     ConstString.all,
     ConstString.prayer,
     ConstString.audio,
     ConstString.encouragement,
-  ];
-
-  static const String demoAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+  ].obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadFavorites();
+    fetchFavorites();
   }
 
-  void loadFavorites() {
-    final list = [
-      FavoriteItemModel(
-        id: '1',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem,
-        audioUrl: demoAudioUrl,
-      ),
-      FavoriteItemModel(
-        id: '2',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem1,
-        audioUrl: demoAudioUrl,
-      ),
-      FavoriteItemModel(
-        id: '3',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.encouragement,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem2,
-        audioUrl: demoAudioUrl,
-      ),
-      FavoriteItemModel(
-        id: '4',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.prayer,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem3,
-        audioUrl: demoAudioUrl,
-      ),
-      FavoriteItemModel(
-        id: '5',
-        title: ConstString.listenToPrayer.tr,
-        categoryTag: ConstString.audio,
-        durationText: '15:45',
-        subtitle: ConstString.prayersSubtitle.tr,
-        imagePath: ImageString.tempItem4,
-        audioUrl: demoAudioUrl,
-      ),
-    ];
+  Future<void> fetchFavorites() async {
+    isLoading.value = true;
+    try {
+      final response = await ApiServices.instance.getServices(
+        AppApiEndPoint.instance.favoriteEndpoint,
+      );
 
-    allFavorites.assignAll(list);
-    _applyFilter();
+      if (isClosed) return;
+
+      if (response != null && response['data'] != null && response['data'] is List) {
+        final List listData = response['data'];
+        final items = listData
+            .map((item) => FavoriteItemModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+        allFavorites.assignAll(items);
+
+        // Seed favorite IDs into FavoriteService
+        for (var fav in items) {
+          FavoriteService.instance.seedFavorite(fav.postId, true);
+        }
+
+        // Collect unique categories
+        final catSet = <String>{ConstString.all, "Prayer", "Audio", "Encouragement", "Teaching", "Image", "Verse"};
+        for (var fav in items) {
+          if (fav.categoryTag.isNotEmpty) {
+            catSet.add(fav.categoryTag);
+          }
+        }
+        categories.assignAll(catSet.toList());
+
+        _applyFilter();
+      } else {
+        allFavorites.clear();
+        filteredFavorites.clear();
+      }
+    } catch (e) {
+      if (isClosed) return;
+      errorLog('Fetch Favorites Error', e);
+      allFavorites.clear();
+      filteredFavorites.clear();
+    } finally {
+      if (!isClosed) isLoading.value = false;
+    }
   }
 
   void filterByCategory(String cat) {
@@ -96,7 +91,7 @@ class FavoritesController extends GetxController {
 
     filteredFavorites.assignAll(
       allFavorites.where((item) {
-        final matchesCat = cat == ConstString.all || item.categoryTag == cat;
+        final matchesCat = cat == ConstString.all || item.categoryTag.toLowerCase() == cat.toLowerCase();
         final matchesSearch = query.isEmpty ||
             item.title.toLowerCase().contains(query) ||
             item.subtitle.toLowerCase().contains(query);
@@ -105,9 +100,14 @@ class FavoritesController extends GetxController {
     );
   }
 
-  void removeFavorite(String id) {
-    allFavorites.removeWhere((item) => item.id == id);
+  Future<void> removeFavorite(FavoriteItemModel item) async {
+    allFavorites.removeWhere((element) => element.id == item.id || element.postId == item.postId);
     _applyFilter();
+
+    await FavoriteService.instance.toggleFavorite(
+      id: item.postId,
+      postType: item.postType,
+    );
   }
 
   void toggleSearch() {
