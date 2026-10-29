@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/audio_service/audio_service_controller.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
+import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'model/teaching_model.dart';
@@ -240,28 +241,31 @@ class _TeachingDetailScreenState extends State<TeachingDetailScreen> {
                             SizedBox(width: 10.w),
 
                             /// Favorite Button
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isFavorite = !isFavorite;
-                                });
-                              },
-                              child: Container(
-                                width: 38.w,
-                                height: 38.h,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withAlpha(40),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                    color: isFavorite ? Colors.redAccent : Colors.white,
-                                    size: 20.sp,
+                            Obx(() {
+                              final favoriteService = FavoriteService.instance;
+                              final isFav = favoriteService.isFavorite(item.id);
+
+                              return GestureDetector(
+                                onTap: () {
+                                  favoriteService.toggleFavorite(id: item.id, postType: "Teaching");
+                                },
+                                child: Container(
+                                  width: 38.w,
+                                  height: 38.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withAlpha(40),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                      color: isFav ? Colors.redAccent : Colors.white,
+                                      size: 20.sp,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ],
                         ),
                       ],

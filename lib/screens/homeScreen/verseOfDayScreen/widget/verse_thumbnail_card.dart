@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:enseignement_vivant/constant/app_colors.dart';
 import '../model/verse_item_model.dart';
 
 class VerseThumbnailCard extends StatelessWidget {
@@ -19,29 +20,51 @@ class VerseThumbnailCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 65.w,
-        height: 65.h,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        width: isSelected ? 72.w : 60.w,
+        height: isSelected ? 72.h : 60.h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.transparent,
-            width: 2.5,
+            color: isSelected ? ConstColor.primaryTeal : Colors.white30,
+            width: isSelected ? 3.0 : 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(15),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              color: isSelected
+                  ? ConstColor.primaryTeal.withAlpha(120)
+                  : Colors.black.withAlpha(30),
+              blurRadius: isSelected ? 12 : 6,
+              spreadRadius: isSelected ? 2 : 0,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14.r),
-          child: Image.asset(
-            item.imagePath,
-            fit: BoxFit.cover,
-          ),
+          borderRadius: BorderRadius.circular(15.r),
+          child: item.imagePath.startsWith('http://') || item.imagePath.startsWith('https://')
+              ? Image.network(
+                  item.imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[800],
+                    child: const Icon(Icons.image_not_supported_outlined, color: Colors.white54),
+                  ),
+                )
+              : (item.imagePath.isNotEmpty && !item.imagePath.startsWith('http')
+                  ? Image.asset(
+                      item.imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[800],
+                        child: const Icon(Icons.image_not_supported_outlined, color: Colors.white54),
+                      ),
+                    )
+                  : Container(
+                      color: Colors.grey[800],
+                      child: const Icon(Icons.image_not_supported_outlined, color: Colors.white54),
+                    )),
         ),
       ),
     );

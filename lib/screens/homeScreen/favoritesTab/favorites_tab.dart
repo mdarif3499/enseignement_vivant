@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/constant/app_assert_image.dart';
+import 'package:enseignement_vivant/routes/app_routes.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/favorites_controller.dart';
 import 'widget/favorite_item_card.dart';
@@ -140,88 +141,150 @@ class FavoritesTab extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// Filter Chips Row
-                      SizedBox(
-                        height: 38.h,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: controller.categories.length,
-                          separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                          itemBuilder: (context, index) {
-                            final catKey = controller.categories[index];
-                            return Obx(() {
-                              final isSelected = controller.selectedCategory.value == catKey;
-                              return GestureDetector(
-                                onTap: () => controller.filterByCategory(catKey),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
-                                  decoration: BoxDecoration(
-                                    color: isSelected ? ConstColor.primaryTeal : const Color(0xFFEFEFF4),
-                                    borderRadius: BorderRadius.circular(20.r),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      catKey.tr,
-                                      style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                        color: isSelected ? Colors.white : const Color(0xFF7A7A7A),
-                                        fontFamily: 'SFPro',
+                child: RefreshIndicator(
+                  color: ConstColor.primaryTeal,
+                  onRefresh: controller.fetchFavorites,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Filter Chips Row
+                        SizedBox(
+                          height: 38.h,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: controller.categories.length,
+                            separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                            itemBuilder: (context, index) {
+                              final catKey = controller.categories[index];
+                              return Obx(() {
+                                final isSelected = controller.selectedCategory.value == catKey;
+                                return GestureDetector(
+                                  onTap: () => controller.filterByCategory(catKey),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 8.h),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? ConstColor.primaryTeal : const Color(0xFFEFEFF4),
+                                      borderRadius: BorderRadius.circular(20.r),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        catKey.tr,
+                                        style: TextStyle(
+                                          fontSize: 13.sp,
+                                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                          color: isSelected ? Colors.white : const Color(0xFF7A7A7A),
+                                          fontFamily: 'SFPro',
+                                        ),
                                       ),
                                     ),
                                   ),
+                                );
+                              });
+                            },
+                          ),
+                        ),
+
+                        Gap(height: 16.h),
+
+                        /// Favorites List
+                        Obx(
+                          () {
+                            if (controller.isLoading.value && controller.allFavorites.isEmpty) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 60.h),
+                                child: const Center(
+                                  child: CircularProgressIndicator(color: ConstColor.primaryTeal),
                                 ),
                               );
-                            });
-                          },
-                        ),
-                      ),
+                            }
 
-                      Gap(height: 16.h),
-
-                      /// Favorites List
-                      Obx(
-                        () => controller.filteredFavorites.isEmpty
-                            ? Center(
+                            if (controller.filteredFavorites.isEmpty) {
+                              return Center(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 40.h),
-                                  child: Text(
-                                    "No favorites saved yet",
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: const Color(0xFF8E8E93),
-                                      fontFamily: 'SFPro',
-                                    ),
+                                  padding: EdgeInsets.symmetric(vertical: 60.h, horizontal: 20.w),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 60.w,
+                                        height: 60.h,
+                                        decoration: BoxDecoration(
+                                          color: ConstColor.primaryTeal.withAlpha(20),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.favorite_border_rounded,
+                                          size: 32.sp,
+                                          color: ConstColor.primaryTeal,
+                                        ),
+                                      ),
+                                      Gap(height: 12.h),
+                                      Text(
+                                        "No favorites saved yet",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF222222),
+                                          fontFamily: 'SFPro',
+                                        ),
+                                      ),
+                                      Gap(height: 4.h),
+                                      Text(
+                                        "Tap the heart icon on any item to add it to your favorites.",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: const Color(0xFF8E8E93),
+                                          fontFamily: 'SFPro',
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              )
-                            : ListView.builder(
-                                itemCount: controller.filteredFavorites.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  final item = controller.filteredFavorites[index];
-                                  return FavoriteItemCard(
-                                    item: item,
-                                    onTap: () {
-                                      // Handle tap
-                                    },
-                                    onRemoveFavorite: () {
-                                      controller.removeFavorite(item.id);
-                                    },
-                                  );
-                                },
-                              ),
-                      ),
+                              );
+                            }
 
-                      Gap(height: 80.h),
-                    ],
+                            return ListView.builder(
+                              itemCount: controller.filteredFavorites.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final item = controller.filteredFavorites[index];
+                                return FavoriteItemCard(
+                                  item: item,
+                                  onTap: () {
+                                    final type = item.postType.toLowerCase();
+                                    if (type.contains('audio')) {
+                                      Get.toNamed(AppRoutes.audioDetailScreen, arguments: item.postId);
+                                    } else if (type.contains('prayer')) {
+                                      Get.toNamed(AppRoutes.prayerDetailScreen, arguments: item.postId);
+                                    } else if (type.contains('teaching')) {
+                                      Get.toNamed(AppRoutes.teachingDetailScreen, arguments: item.postId);
+                                    } else if (type.contains('encouragement')) {
+                                      Get.toNamed(AppRoutes.encouragementDetailScreen, arguments: item.postId);
+                                    } else if (type.contains('image')) {
+                                      Get.toNamed(AppRoutes.imageDetailScreen, arguments: item.postId);
+                                    } else if (type.contains('verse')) {
+                                      Get.toNamed(AppRoutes.verseOfDayScreen);
+                                    } else {
+                                      Get.toNamed(AppRoutes.audioDetailScreen, arguments: item.postId);
+                                    }
+                                  },
+                                  onRemoveFavorite: () {
+                                    controller.removeFavorite(item);
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+
+                        Gap(height: 80.h),
+                      ],
+                    ),
                   ),
                 ),
               ),
