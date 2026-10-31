@@ -6,6 +6,7 @@ import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
 import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
+import 'package:enseignement_vivant/widgers/comment_bottom_sheet/comment_bottom_sheet.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'package:enseignement_vivant/screens/homeScreen/encouragementsScreen/model/encouragement_model.dart';
@@ -229,6 +230,30 @@ class _EncouragementDetailScreenState extends State<EncouragementDetailScreen> {
                                 ),
                               );
                             }),
+
+                            SizedBox(width: 10.w),
+
+                            /// Comment Button
+                            GestureDetector(
+                              onTap: () {
+                                CommentBottomSheet.show(context, postId: item.id, postType: "Encouragement");
+                              },
+                              child: Container(
+                                width: 38.w,
+                                height: 38.h,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha(40),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.mode_comment_outlined,
+                                    color: Colors.white,
+                                    size: 18.sp,
+                                  ),
+                                ),
+                              ),
+                            ),
 
                             SizedBox(width: 10.w),
 

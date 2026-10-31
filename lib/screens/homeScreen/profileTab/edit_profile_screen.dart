@@ -45,16 +45,27 @@ class EditProfileScreen extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 45.r,
-                      backgroundColor: ConstColor.primaryTeal.withAlpha(40),
-                      child: Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 48.sp),
+                    GestureDetector(
+                      onTap: controller.pickImage,
+                      child: Obx(() {
+                        final pickedFile = controller.selectedImageFile.value;
+                        final currentImgUrl = controller.profileController.profileImage.value;
+
+                        return CircleAvatar(
+                          radius: 45.r,
+                          backgroundColor: ConstColor.primaryTeal.withAlpha(40),
+                          backgroundImage: pickedFile != null
+                              ? FileImage(pickedFile) as ImageProvider
+                              : (currentImgUrl.isNotEmpty ? NetworkImage(currentImgUrl) : null),
+                          child: (pickedFile == null && currentImgUrl.isEmpty)
+                              ? Icon(Icons.person_rounded, color: ConstColor.primaryTeal, size: 48.sp)
+                              : null,
+                        );
+                      }),
                     ),
                     Gap(height: 10.h),
                     GestureDetector(
-                      onTap: () {
-                        // Change profile picture
-                      },
+                      onTap: controller.pickImage,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -99,7 +110,7 @@ class EditProfileScreen extends StatelessWidget {
 
               Gap(height: 14.h),
 
-              /// Editable Email Field
+              /// Editable Email Field (Read-Only as per standard auth)
               Text(
                 ConstString.email.tr,
                 style: TextStyle(
@@ -112,6 +123,7 @@ class EditProfileScreen extends StatelessWidget {
               Gap(height: 6.h),
               CustomTextField(
                 controller: controller.emailController,
+                readOnly: true,
                 keyboardType: TextInputType.emailAddress,
               ),
 
@@ -158,10 +170,13 @@ class EditProfileScreen extends StatelessWidget {
               Gap(height: 40.h),
 
               /// Save Changes Button
-              CustomButton(
-                text: ConstString.saveChanges.tr,
-                backgroundColor: ConstColor.primaryTeal,
-                onTap: controller.saveProfile,
+              Obx(
+                () => CustomButton(
+                  text: ConstString.saveChanges.tr,
+                  backgroundColor: ConstColor.primaryTeal,
+                  isLoading: controller.isLoading.value,
+                  onTap: controller.isLoading.value ? null : controller.saveProfile,
+                ),
               ),
 
               Gap(height: 16.h),

@@ -29,7 +29,7 @@ class ImagesController extends GetxController {
     isLoading.value = true;
     try {
       final queryParams = <String, dynamic>{
-        "status": "publish",
+        "status": "scheduled",
       };
 
       if (selectedCategory.value != ConstString.all &&

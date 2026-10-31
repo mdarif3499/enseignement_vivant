@@ -28,11 +28,12 @@ class AppApiEndPoint {
   String verseEndpoint = "/verse";
   String favoriteEndpoint = "/favorite";
   String notificationEndpoint = "/notification";
+  String commentEndpoint = "/comment";
 }
 
 String _getDomain() {
-  String liveServer = "http://10.10.26.164:5010";
-  String localServer = "http://10.10.26.164:5010";
+  String liveServer = "https://shariful5003.binarybards.online";
+  String localServer = "https://shariful5003.binarybards.online";
 
   try {
     if (kDebugMode) {

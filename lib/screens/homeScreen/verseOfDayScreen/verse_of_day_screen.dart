@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
 import 'package:enseignement_vivant/services/download/download_service.dart';
-import 'package:enseignement_vivant/services/favorite/favorite_service.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/verse_of_day_controller.dart';
 import 'widget/page_curl_widget.dart';
@@ -17,8 +16,6 @@ class VerseOfDayScreen extends StatefulWidget {
 }
 
 class _VerseOfDayScreenState extends State<VerseOfDayScreen> {
-  bool isFavorite = false;
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(VerseOfDayController());
@@ -159,34 +156,6 @@ class _VerseOfDayScreenState extends State<VerseOfDayScreen> {
                           );
                         }),
 
-                        SizedBox(width: 10.w),
-
-                        /// Favorite Button
-                        Obx(() {
-                          final favoriteService = FavoriteService.instance;
-                          final isFav = favoriteService.isFavorite(currentVerse.id);
-
-                          return GestureDetector(
-                            onTap: () {
-                              favoriteService.toggleFavorite(id: currentVerse.id, postType: "Verse");
-                            },
-                            child: Container(
-                              width: 38.w,
-                              height: 38.h,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withAlpha(60),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                  color: isFav ? Colors.redAccent : Colors.white,
-                                  size: 20.sp,
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
                       ],
                     ),
                   ],
