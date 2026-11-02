@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
+import 'package:enseignement_vivant/constant/app_const_string.dart';
 import '../controller/comment_controller.dart';
 import '../model/comment_model.dart';
 
@@ -32,14 +33,14 @@ class CommentItemCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text("Cancel", style: TextStyle(color: const Color(0xFF8E8E93), fontSize: 13.sp, fontFamily: 'SFPro')),
+            child: Text(ConstString.cancel.tr, style: TextStyle(color: const Color(0xFF8E8E93), fontSize: 13.sp, fontFamily: 'SFPro')),
           ),
           TextButton(
             onPressed: () {
               Get.back();
               controller.deleteComment(commentId: commentId, postId: postId, parentComment: parentComment);
             },
-            child: Text("Delete", style: TextStyle(color: Colors.redAccent, fontSize: 13.sp, fontWeight: FontWeight.bold, fontFamily: 'SFPro')),
+            child: Text(ConstString.delete.tr, style: TextStyle(color: Colors.redAccent, fontSize: 13.sp, fontWeight: FontWeight.bold, fontFamily: 'SFPro')),
           ),
         ],
       ),
@@ -111,7 +112,7 @@ class CommentItemCard extends StatelessWidget {
                                   children: [
                                     Icon(Icons.edit_rounded, color: const Color(0xFF222222), size: 16.sp),
                                     SizedBox(width: 8.w),
-                                    Text('Edit', style: TextStyle(fontSize: 13.sp, fontFamily: 'SFPro')),
+                                    Text(ConstString.edit.tr, style: TextStyle(fontSize: 13.sp, fontFamily: 'SFPro')),
                                   ],
                                 ),
                               ),
@@ -121,7 +122,7 @@ class CommentItemCard extends StatelessWidget {
                                   children: [
                                     Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 16.sp),
                                     SizedBox(width: 8.w),
-                                    Text('Delete', style: TextStyle(fontSize: 13.sp, color: Colors.redAccent, fontFamily: 'SFPro')),
+                                    Text(ConstString.delete.tr, style: TextStyle(fontSize: 13.sp, color: Colors.redAccent, fontFamily: 'SFPro')),
                                   ],
                                 ),
                               ),
@@ -152,7 +153,7 @@ class CommentItemCard extends StatelessWidget {
                           controller.fetchReplies(item);
                         },
                         child: Text(
-                          "Reply",
+                          ConstString.reply.tr,
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
@@ -176,8 +177,8 @@ class CommentItemCard extends StatelessWidget {
                                 },
                                 child: Text(
                                   item.isRepliesExpanded.value
-                                      ? "Hide replies"
-                                      : "View replies (${item.replies.length})",
+                                      ? ConstString.hideReplies.tr
+                                      : "${ConstString.viewReplies.tr} (${item.replies.length})",
                                   style: TextStyle(
                                     fontSize: 11.sp,
                                     color: const Color(0xFF8E8E93),

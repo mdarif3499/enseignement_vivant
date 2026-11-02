@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
@@ -35,7 +36,7 @@ class DeleteAccountController extends GetxController {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Confirm Account Deletion",
+                    ConstString.confirmAccountDeletion.tr,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -51,7 +52,7 @@ class DeleteAccountController extends GetxController {
               ),
               Gap(height: 10.h),
               Text(
-                "Please enter your password to confirm account deletion.",
+                ConstString.enterPasswordToDelete.tr,
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: const Color(0xFF6B7280),
@@ -62,7 +63,7 @@ class DeleteAccountController extends GetxController {
               Gap(height: 16.h),
               Obx(
                 () => CustomTextField(
-                  hintText: "Enter password",
+                  hintText: ConstString.enterPassword.tr,
                   controller: passwordController,
                   obscureText: isObscure.value,
                   prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF8E8E93)),
@@ -91,7 +92,7 @@ class DeleteAccountController extends GetxController {
                       ),
                       onPressed: () => Get.back(),
                       child: Text(
-                        "Cancel",
+                        ConstString.cancel.tr,
                         style: TextStyle(
                           fontSize: 13.sp,
                           color: const Color(0xFF6B7280),
@@ -122,7 +123,7 @@ class DeleteAccountController extends GetxController {
                                 ),
                               )
                             : Text(
-                                "Delete",
+                                ConstString.delete.tr,
                                 style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.bold,

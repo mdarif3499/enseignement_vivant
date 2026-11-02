@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
-import 'package:enseignement_vivant/model/app_user_data.dart';
 import 'package:enseignement_vivant/routes/app_routes.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
-import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
 import 'package:enseignement_vivant/widgers/custom_snack_bar/app_snack_bar.dart';
 
@@ -43,41 +41,23 @@ class SignUpController extends GetxController {
 
       if (response != null) {
         final statusCode = response['statusCode'];
-        final suggestRoute = response['suggestRoute']?.toString();
         final message = response['message']?.toString() ?? '';
-        final isSuccess = response['success'] == true &&
-            (statusCode == null || statusCode == 200 || statusCode == 201);
-        final isUnverified =
-            suggestRoute != null || message.toLowerCase().contains('verify');
+        final isSuccess = response['success'] == true ||
+            (statusCode != null && (statusCode == 200 || statusCode == 201));
 
-        if (isUnverified) {
-          final targetEmail = response['email']?.toString() ?? userEmail;
+        if (isSuccess) {
+          final targetEmail = response['email']?.toString() ??
+              response['data']?['email']?.toString() ??
+              userEmail;
+
           AppSnackBar.instance.success(message.isNotEmpty
               ? message
               : "Please check your email for verification code.");
+
           Get.toNamed(AppRoutes.forgotVerifyOtpScreen, arguments: {
             "email": targetEmail,
             "isForgotPassword": false,
           });
-        } else if (isSuccess) {
-          AppSnackBar.instance.success(
-              message.isNotEmpty ? message : 'User created successfully');
-
-          if (response['data'] != null) {
-            final userData = AppUserModel.fromJson(response['data']);
-            if (userData.name != null && userData.email != null) {
-              await StorageServices.instance.saveUserProfile(
-                name: userData.name!,
-                email: userData.email!,
-                image: userData.profileImage ?? '',
-                city: '',
-              );
-            }
-          }
-
-          if (isClosed) return;
-
-          Get.offAllNamed(AppRoutes.signInScreen);
         } else {
           AppSnackBar.instance
               .error(message.isNotEmpty ? message : "Registration failed.");

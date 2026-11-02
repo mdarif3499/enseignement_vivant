@@ -398,7 +398,7 @@ class AudioScreen extends StatelessWidget {
             ),
             Gap(height: 16.h),
             Text(
-              "No Audio Available",
+              ConstString.noAudioAvailable.tr,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -408,7 +408,7 @@ class AudioScreen extends StatelessWidget {
             ),
             Gap(height: 6.h),
             Text(
-              "There are currently no audio recordings in this category.",
+              ConstString.noAudioDesc.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
@@ -422,7 +422,7 @@ class AudioScreen extends StatelessWidget {
               onPressed: controller.fetchAudioList,
               icon: Icon(Icons.refresh_rounded, size: 18.sp, color: Colors.white),
               label: Text(
-                "Refresh",
+                ConstString.refresh.tr,
                 style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(

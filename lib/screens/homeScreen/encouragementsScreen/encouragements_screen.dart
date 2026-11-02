@@ -127,7 +127,7 @@ class EncouragementsScreen extends StatelessWidget {
             ),
             Gap(height: 16.h),
             Text(
-              "No Encouragements Available",
+              ConstString.noEncouragementsAvailable.tr,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class EncouragementsScreen extends StatelessWidget {
             ),
             Gap(height: 6.h),
             Text(
-              "There are currently no encouragement entries available right now.",
+              ConstString.noEncouragementsDesc.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
@@ -151,7 +151,7 @@ class EncouragementsScreen extends StatelessWidget {
               onPressed: controller.fetchEncouragements,
               icon: Icon(Icons.refresh_rounded, size: 18.sp, color: Colors.white),
               label: Text(
-                "Refresh",
+                ConstString.refresh.tr,
                 style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(

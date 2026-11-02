@@ -347,7 +347,7 @@ class PrayersScreen extends StatelessWidget {
             ),
             Gap(height: 16.h),
             Text(
-              "No Prayers Available",
+              ConstString.noPrayersAvailable.tr,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
@@ -357,7 +357,7 @@ class PrayersScreen extends StatelessWidget {
             ),
             Gap(height: 6.h),
             Text(
-              "There are currently no prayers in this list. Please check back later.",
+              ConstString.noPrayersDesc.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
@@ -371,7 +371,7 @@ class PrayersScreen extends StatelessWidget {
               onPressed: controller.fetchPrayers,
               icon: Icon(Icons.refresh_rounded, size: 18.sp, color: Colors.white),
               label: Text(
-                "Refresh",
+                ConstString.refresh.tr,
                 style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(

@@ -185,18 +185,18 @@ class DownloadsScreen extends StatelessWidget {
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         title: Text(
-          "Delete Download",
+          ConstString.deleteDownload.tr,
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, fontFamily: 'SFPro'),
         ),
         content: Text(
-          "Are you sure you want to remove '$title' from your downloads?",
+          ConstString.deleteDownloadDesc.tr,
           style: TextStyle(fontSize: 13.sp, color: const Color(0xFF555555), fontFamily: 'SFPro'),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              "Cancel",
+              ConstString.cancel.tr,
               style: TextStyle(color: const Color(0xFF8E8E93), fontSize: 14.sp, fontFamily: 'SFPro'),
             ),
           ),
@@ -210,7 +210,7 @@ class DownloadsScreen extends StatelessWidget {
               controller.onDeleteItem(id);
             },
             child: Text(
-              "Delete",
+              ConstString.delete.tr,
               style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold, fontFamily: 'SFPro'),
             ),
           ),
