@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_api_end_point.dart';
+import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/services/api/api_services.dart';
 import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/utils/error_log.dart';
@@ -27,19 +28,19 @@ class ChangePasswordController extends GetxController {
     final confirmPassword = confirmPasswordController.text.trim();
 
     if (currentPassword.isEmpty) {
-      AppSnackBar.instance.error("Please enter current password");
+      AppSnackBar.instance.error(ConstString.pleaseEnterCurrentPassword.tr);
       return;
     }
     if (newPassword.isEmpty) {
-      AppSnackBar.instance.error("Please enter new password");
+      AppSnackBar.instance.error(ConstString.pleaseEnterNewPassword.tr);
       return;
     }
     if (newPassword.length < 6) {
-      AppSnackBar.instance.error("Password must be at least 6 characters");
+      AppSnackBar.instance.error(ConstString.passwordMinLength.tr);
       return;
     }
     if (newPassword != confirmPassword) {
-      AppSnackBar.instance.error("New password and confirm password do not match");
+      AppSnackBar.instance.error(ConstString.passwordsDoNotMatch.tr);
       return;
     }
 

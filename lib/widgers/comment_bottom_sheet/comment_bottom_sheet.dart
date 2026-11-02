@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:enseignement_vivant/constant/app_colors.dart';
+import 'package:enseignement_vivant/constant/app_const_string.dart';
 import 'package:enseignement_vivant/services/storage_services/get_storage_services.dart';
 import 'package:enseignement_vivant/utils/gap.dart';
 import 'controller/comment_controller.dart';
@@ -48,7 +49,7 @@ class CommentBottomSheet {
                     Row(
                       children: [
                         Text(
-                          "Comments",
+                          ConstString.comments.tr,
                           style: TextStyle(
                             fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
@@ -87,7 +88,10 @@ class CommentBottomSheet {
 
               const Divider(color: Color(0xFFE5E7EB), thickness: 1),
 
-              /// Comments List
+              /// Comments List  vector_graphics_compiler 1.3.0 (1.3.4 available)
+
+
+
               Expanded(
                 child: Obx(
                   () {
@@ -109,7 +113,7 @@ class CommentBottomSheet {
                             ),
                             Gap(height: 12.h),
                             Text(
-                              "No comments yet",
+                              ConstString.noCommentsYet.tr,
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 color: const Color(0xFF8E8E93),
@@ -118,7 +122,7 @@ class CommentBottomSheet {
                             ),
                             Gap(height: 4.h),
                             Text(
-                              "Be the first to share your thoughts!",
+                              ConstString.beFirstToComment.tr,
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 color: const Color(0xFFA1A1A1),
@@ -187,7 +191,7 @@ class CommentBottomSheet {
                               SizedBox(width: 6.w),
                               Expanded(
                                 child: Text(
-                                  "Replying to @${replyingTo.userName}",
+                                  "${ConstString.replyingTo.tr} @${replyingTo.userName}",
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
@@ -228,7 +232,7 @@ class CommentBottomSheet {
                               SizedBox(width: 6.w),
                               Expanded(
                                 child: Text(
-                                  "Editing comment...",
+                                  ConstString.editingComment.tr,
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
@@ -278,7 +282,7 @@ class CommentBottomSheet {
                                 controller: controller.commentInputController,
                                 style: TextStyle(fontSize: 13.sp, color: Colors.black87),
                                 decoration: InputDecoration(
-                                  hintText: "Add a comment...",
+                                  hintText: ConstString.addAComment.tr,
                                   hintStyle: TextStyle(fontSize: 13.sp, color: const Color(0xFF8E8E93)),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(vertical: 10.h),

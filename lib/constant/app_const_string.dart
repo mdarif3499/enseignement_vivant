@@ -131,4 +131,28 @@ class ConstString {
   static const String enjoy30Off = 'enjoy30Off';
   static const String enjoy30OffDesc = 'enjoy30OffDesc';
   static const String santaMariaMessage = 'santaMariaMessage';
+
+  static const String pleaseEnterCurrentPassword = 'pleaseEnterCurrentPassword';
+  static const String pleaseEnterNewPassword = 'pleaseEnterNewPassword';
+  static const String passwordMinLength = 'passwordMinLength';
+  static const String passwordsDoNotMatch = 'passwordsDoNotMatch';
+  static const String passwordChangedSuccessfully = 'passwordChangedSuccessfully';
+  static const String confirmAccountDeletion = 'confirmAccountDeletion';
+  static const String enterPasswordToDelete = 'enterPasswordToDelete';
+  static const String enterPassword = 'enterPassword';
+  static const String cancel = 'cancel';
+  static const String delete = 'delete';
+  static const String comments = 'comments';
+  static const String noCommentsYet = 'noCommentsYet';
+  static const String beFirstToComment = 'beFirstToComment';
+  static const String addAComment = 'addAComment';
+  static const String reply = 'reply';
+  static const String viewReplies = 'viewReplies';
+  static const String hideReplies = 'hideReplies';
+  static const String replyingTo = 'replyingTo';
+  static const String editingComment = 'editingComment';
+  static const String edit = 'edit';
+  static const String noFavoritesSaved = 'noFavoritesSaved';
+  static const String noDownloadsYet = 'noDownloadsYet';
+  static const String profileUpdatedSuccessfully = 'profileUpdatedSuccessfully';
 }
